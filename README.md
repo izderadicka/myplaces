@@ -4,6 +4,7 @@ It's based on django, geo-django, postgis and uses OpenStreetMap data and servic
 
 Install:
 ========
+```
  # debian/ubuntu 
  sudo apt-get build-essential
  sudo apt-get install python-pip
@@ -13,6 +14,7 @@ Install:
  sudo apt-get install python-numpy python-matplotlib
 
  #assure you have libzmq >= 3.2.3, may install it from source (ubuntu 13.04 has 2.2) - http://zeromq.org/intro:get-the-software
+```
  
 Versions History:
 =================
