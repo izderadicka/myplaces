@@ -1,0 +1,16 @@
+/__init__.pyc
+/admin.pyc
+/forms.pyc
+/fortune.pyc
+/geocode.pyc
+/implaces.pyc
+/models.pyc
+/remote.pyc
+/resources.pyc
+/sockets.pyc
+/tests.pyc
+/urls.pyc
+/utils.pyc
+/views.pyc
+/voronoi.pyc
+/widgets.pyc
