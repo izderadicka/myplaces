@@ -203,17 +203,17 @@ class TestApi(test.LiveServerTestCase):
             self.assertTrue(e.body.get('position') is not None)
            
         res=c.post(ApiClient.PLACE, {"name":"Zajímave místo", "url":"http://nekde.jinde.cz", "address":adr_id,
-                                     "group":group_id, 'position':'POINT(14.5 50)'})
+                                     "group":group_id, 'position':[14.5, 50]})
         print res
         try:
             c.post(ApiClient.PLACE, {"name":"Zajímave místo", "url":"http://nekde.jinde.cz", "address":adr_id,
-                                     "group":group_id, 'position':(14.5, 50)})
+                                     "group":group_id, 'position':'POINT (14.5 50)'})
             self.fail()
         except ApiError, e:
             pass
         
         res=c.put(ApiClient.PLACE,  {"name":"Nejzajímavější místo", "url":"http://nekde.jinde.cz", 
-                               "address":adr_id, "group":group_id, 'position':'POINT(14.5 50.2)'},
+                               "address":adr_id, "group":group_id, 'position':[14.5, 50.2]},
                                pk=res['id'])    
         
         self.assertEqual(res['name'], u"Nejzajímavější místo")

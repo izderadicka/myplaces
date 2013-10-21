@@ -27,6 +27,7 @@ RCS
 RCSLOG
 SCCS
 _$*
+.~lock*
 /bs4
 /django_filters
 /django_mobile
@@ -39,3 +40,4 @@ _$*
 /tagging
 /web
 /.coverage
+/test_workers

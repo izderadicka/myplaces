@@ -9,6 +9,8 @@ Install:
  sudo apt-get install python-pip
  sudo apt-get install libevent-dev
  sudo pip -r requirements.pip
+ #numpy and matplotlib would be quicker from distro packages
+ sudo apt-get install python-numpy python-matplotlib
 
  #assure you have libzmq >= 3.2.3, may install it from source (ubuntu 13.04 has 2.2) - http://zeromq.org/intro:get-the-software
  

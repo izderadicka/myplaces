@@ -4,4 +4,5 @@ beautifulsoup4>=4.2.1
 django-filter>=0.7
 django_mobile>=0.3.0
 pyzmq>=13.0.2
+django-tagging>=0.3.1
 git+https://github.com/izderadicka/rest2backbone.git#egg=rest2backbone
