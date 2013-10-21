@@ -1,0 +1,229 @@
+{%extends 'base.html'%}
+{% load url from future %}
+{% load i18n %} 
+{%block title%}
+MyPlaces
+{%endblock%}
+{%block head_script%}
+
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.css"/>
+<script type="text/javascript" src="{{STATIC_URL}}js/Leaflet/leaflet.js"></script>
+<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.ie.css" /><![endif]-->
+<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster/MarkerCluster.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.css" />
+<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.ie.css" /><![endif]-->
+<script src="{{STATIC_URL}}js/Leaflet.markercluster/leaflet.markercluster.js"></script>
+<script src="{{STATIC_URL}}/mp/js/map.js"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}mp/css/map.css">
+
+<script  src="{{STATIC_URL}}js/underscore-min.js"></script>
+<script  src="{{STATIC_URL}}js/backbone-min.js"></script>
+<script  src="{%url 'js-api'%}"></script>
+<script src="{{STATIC_URL}}js/api-forms.js"></script>
+<script  src="{{STATIC_URL}}mp/js/app.js"></script>
+{%endblock%}
+{%block body%}
+<div class="screen_view">
+<section id="header">
+<div id="top_bar">
+<div><a href="#"><span id="logo">MyPlaces</span></a></div>
+{%if flavour == 'full' %}
+<div id="login">
+{%if user.is_authenticated  %}
+
+<form action="/logout/" method="get">
+<span class="current_user">{{user}}</span>
+<input type="hidden" name="next" value="{%url 'home'%}">
+<input type="submit" value="{%trans 'Log Out'%}" id="logout-btn">
+</form>
+{%else%}
+<form id="login_form" action="/login/" method="post">
+ {% csrf_token %}
+<label for="id_username">{%trans 'Login:'%}</label><input type="text" name="username" id="id_username">
+<label for="id_password">{%trans 'Password:'%}</label><input type="password" name="password" id="id_password">
+<input type="hidden" name="next" value="{%url 'home'%}">
+<input type="submit"  value="{%trans 'Log In'%}">
+</form>
+{%endif%}
+</div>
+{%endif%}
+<div id="menu_btn"></div>
+</div>
+</section>
+
+<section id="main">
+<div id="content">
+{%if flavour == 'full' %}
+<div id="left_panel"></div>
+<div id="right_panel"></div>
+{%else%}
+<div id="one_panel"></div>
+{%endif%}
+</div>
+</section>
+{%if flavour == 'full'%}
+<section id="footer">
+<div id="footer_line">
+<ul>
+<li>Site Flavour: {{flavour}}</li>
+<li><a href="#">{%trans 'About'%}</a></li>
+<li><a href="#">{%trans 'Contact'%}</a>
+</ul>
+</div>
+</div>
+</section>
+{%endif%}
+</div>
+
+{{params.forms.render_all}}
+
+
+<script type="text/template" id="form_template">
+<form>
+<%=fields%>
+<div class="btn_bar">
+<input type="button" class="save_btn" value="{%trans 'Save'%}">
+<input type="button" class="cancel_btn" value="{%trans 'Cancel'%}">
+<% if (! isNew ) { %>
+<input type="button" class="confirm_delete_btn" value="{%trans 'Delete'%}">
+<% } %>
+</div>
+</form>
+</script>
+
+<script type="text/template" id="group_places_detail">
+<div id="group_places">
+<h2><%=name%></h2>
+<div class="search_bar">
+<input type="search" id="place_search_<%=id%>" class="search">
+<div id="place_search_btn" class="search_btn"></div>
+<div class="new_btn"></div>
+</div>
+<div id="places_list" class="list_container"></div>
+</div>
+</script>
+
+
+<script type="text/template" id="groups_template">
+<div class="search_bar">
+<input type="search" id="group_search" class="search">
+<div id="group_search_btn" class="search_btn"></div>
+<div class="new_btn"></div>
+</div>
+<div id="group_list" class="list_container"></div>
+</div>
+</script>
+
+<script type="text/template" id="groups_list_template">
+<ul id="groups_list" class="list">
+</ul>
+<div class="list_footer">
+<% if (previousPage) { %>
+<a class="previous">&lt;&lt;</a>
+<% } %>
+<% if (nextPage) { %>
+<a class="next">&gt;&gt;</a>
+<% } %>
+</div>
+</script>
+
+<script type="text/template" id="group_item_template">
+<li data-pk="<%= id %>">
+<% if (attributes.count>0) { %>
+<div class='map_btn small_btn'></div>
+<% } %>
+<% if (attributes.is_mine) { %>
+<div class='edit_btn small_btn'></div>
+<% } %>
+<span class="title"><%= title %></span>
+<div class="item-detail">
+</div>
+</li>
+</script>
+
+<script type="text/template" id="place_item_template">
+<li data-pk="<%= id %>">
+
+<div class='map_btn small_btn'></div>
+<% if (attributes.is_mine) { %>
+<div class='edit_btn small_btn'></div>
+<% } %>
+<span class="title"><%= title %></span>
+<div class="item-detail">
+</div>
+</li>
+</script>
+
+<script type="text/template" id="place_template">
+<div class="place_detail">
+<div class="position">
+<span class="lat"><%=position[0]%></span>,<span class="lng"><%=position[1]%></span>
+</div>
+<% if (url) { %>
+<a target="_blank" href="<%=url%>" class="place_link"></a>
+<% } %>
+<div class="address"><%=address_string%></div>
+<p class="description"><%=description%></p>
+</div>
+</script>
+
+<script type="text/template" id="group_title_template">
+<%= name %>
+</script>
+
+<script type="text/template" id="group_detail">
+<div class="group-details">
+<div class="counter">
+<div class="number"><%=count%></div>
+<div class="label-small">{%trans 'Places'%}</div>
+</div>
+<p><%=description%></p>
+</div>
+</script>
+
+<script type="text/template" id="initial_banner">
+<div class="banner1">
+<h1>{% trans 'Places ...'%}</h1>
+<h1>{% trans 'My Places'%}</h1>
+<h1>{% trans 'Your Places'%}</h1>
+<h1>{% trans 'Many Places ...'%}</h1>
+<h2>{%trans 'Map Them, Discover Them'%}</h2>
+</div>
+</script>
+
+
+<script type="text/template" id="confirm_delete">
+<div class="dialog small">
+<p>{% trans 'Really delete?'%}</p>
+<div class="btn_bar">
+<input type="button" class="delete_btn" value="{%trans 'Yes'%}">
+<input type="button" class="close_dialog_btn" value="{%trans 'No'%}">
+</div>
+</div>
+</script>
+<script>
+var siteFlavour='{{flavour}}';
+</script>
+
+<script type="text/template" id="main_menu" >
+<ul id="main_menu_list">
+{% if not user.is_authenticated %}
+<li><a href="/login?next=%2Fmp">{%trans 'Login'%}</a></li>
+{%endif%}
+<li><a href="{%url 'home' %}">{%trans 'Reload'%}</a></li>
+<li><a target="_blank" href="{%url 'upload-places' step=1%}">{%trans 'Import'%}</a></li>
+{% if user.is_authenticated %}
+{%if flavour == "full" %}
+<li><a href="{%url 'home' %}?flavour=mobile">{%trans 'Mobile Site'%}</a></li>
+{%else%}
+<li><a href="{%url 'home' %}?flavour=full">{%trans 'Full Site'%}</a></li>
+{%endif%}
+<li><a href="/logout?next=%2Fmp">{%trans 'Logout'%}</a></li>
+{%endif%}
+</ul>
+</script>
+
+
+
+
+{%endblock%}

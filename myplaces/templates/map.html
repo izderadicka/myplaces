@@ -1,0 +1,37 @@
+{%extends 'base.html'%}
+{% load url from future %}
+{% load i18n %} 
+{%block title%}
+{% trans 'Map' %}
+{%endblock%}
+{%block head_script%}
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.css"/>
+<script type="text/javascript" src="{{STATIC_URL}}js/Leaflet/leaflet.js"></script>
+<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.ie.css" /><![endif]-->
+<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster/MarkerCluster.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.css" />
+<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.ie.css" /><![endif]-->
+<script src="{{STATIC_URL}}js/Leaflet.markercluster/leaflet.markercluster.js"></script>
+<script src="{{STATIC_URL}}/mp/js/map.js"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}mp/css/map.css">
+
+{%endblock%}
+{%block body%}
+<style>
+html {
+height: 100%;
+}
+</style>
+<div id="map">Map goes here</div>
+<script>
+
+var mapObject=createMap('map', {backControl:'topleft', locateControl:'topleft', layersControl:'topright'});
+{% if params.group_id%}
+mapObject.displayGroup({{params.group_id}}{%if params.place_id%}, {{params.place_id}}{%endif%});
+{%else%}
+mapObject.map.setView([49,15], 12);
+mapObject.locatePosition();
+{%endif%}
+$('#map').show();
+</script>
+{%endblock%}

@@ -1,0 +1,7 @@
+Django>=1.4.5
+djangorestframework>=2.3.8
+beautifulsoup4>=4.2.1
+django-filter>=0.7
+django_mobile>=0.3.0
+pyzmq>=13.0.2
+git+https://github.com/izderadicka/rest2backbone.git#egg=rest2backbone

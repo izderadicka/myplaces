@@ -1,0 +1,61 @@
+#map {
+    height: 100%;
+    width:100%;
+    display:none;
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index: 9999;
+    }
+    
+div.button-control {
+    border: 1px solid lightgray;
+    border-radius: 6px 6px 6px 6px;
+    height: 32px;
+    width: 32px;
+    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);
+    cursor:pointer;
+    display: inline-block;
+}
+
+.button-container .button-control:not(:last-child) {
+    margin-right: 8px;
+}
+
+div.button-control.locate {
+	background: url("/static/mp/img/locate.png") no-repeat scroll 1px -1px transparent;
+}
+
+div.button-control.back {
+	background: url("/static/mp/img/arrow_back.png") no-repeat scroll -4px -4px;
+}
+
+.leaflet-bar a, .leaflet-bar a:hover {
+	width:32px !important;
+}
+
+div.button-control.done {
+    background: url("/static/mp/img/check_mark.svg") no-repeat scroll 1px 2px #FFFFFF;
+     background-size: 30px;
+}
+
+div.button-control.close {
+    background: url("/static/mp/img/close.svg") no-repeat scroll 1px 2px #FFFFFF;
+     background-size: 30px;
+}
+
+.leaflet-control-layers-toggle {
+   
+    height: 34px  !important;
+    width: 34px  !important;
+}
+
+.leaflet-control-layers, .leaflet-bar  {
+    
+    border: medium none !important;
+    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-control-layers {
+    font-size: 1.7em;
+}

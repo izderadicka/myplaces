@@ -1,0 +1,22 @@
+{%extends 'base.html'%}
+{% load url from future %}
+{% load i18n %} 
+{%block title%}
+{% trans 'Import Places' %}
+{%endblock%}
+{%block body%}
+<h1>{%blocktrans%}Import Places - Step {{step}}{%endblocktrans%}</h1>
+<p class="form_help">
+{%blocktrans%}
+Provide Places Group Name and CSV file with places definition.<br>
+CSV file must contains place name and coordinates or postal address.
+{%endblocktrans%}
+</p>
+<form method="POST" action="{%url 'upload-places' step%}" enctype="multipart/form-data">
+{% csrf_token %}
+  <table class="form_table">
+	{{form.as_table}}
+	<tr><td></td><td><input type="submit" value="{%trans 'Next'%}"/></td></tr>
+	</table>
+</form>
+{%endblock%}

@@ -1,0 +1,474 @@
+html {
+	height:100%
+}
+
+body {
+	font-family: sans-serif;
+   padding: 0;
+   margin: 0;
+   height: 100%;
+   background-color: #FEFEFD;
+}
+
+.screen_view {
+    height: 100%;
+    position:relative;
+}
+
+#main {
+	  height: 90%;
+    height: calc(100% - 98px);
+    clear:both;
+}
+
+#content {
+	height:100%;
+	
+}
+
+#left_panel, #right_panel {
+    border-color: #D3D3D3;
+    border-style: dashed;
+    border-width: 4px;
+    float: left;
+    height: 97%;
+    height: calc(100% - 10px);
+    margin: 0 20px;
+    width: 45%;
+    width: calc(50% - 48px);
+    overflow:auto;
+    position:relative;
+}
+
+#top_bar a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#logo {
+    font-size: 2em;
+    font-weight: bolder;
+    padding-left: 35px;
+    background: url('/static/mp/img/map_marker.svg') no-repeat  6px 6px;
+    background-size:  20px auto;
+    width: 150px;
+    padding-top: 3px;
+}
+#top_bar {
+	position:relative;
+	margin-bottom: 25px;
+}
+#login {
+    float: right;
+    right: 60px;
+    position: absolute;
+    top:  8px;
+    font-weight: bold;
+}
+#login input[type="text"], #login input[type="password"] {
+	 font-size: 0.9em;
+}
+
+.login_form_separate {
+	margin:10px;
+}
+
+#top_bar #menu_btn {
+    background: url("/static/mp/img/menu.svg") no-repeat scroll 3px 2px rgba(0, 0, 0, 0);
+    background-size:   24px 24px;
+    border: 3px solid #000000;
+    float: right;
+    height: 30px;
+    width: 30px;
+    position:absolute;
+    top:3px;
+    right:10px;
+    cursor:pointer;
+}
+
+
+#main_menu_displayed > ul {
+    font-size: 1.5em;
+    list-style: none outside none;
+    padding-left: 0px;
+    margin: 0;
+}
+#main_menu_list li {
+    padding: 5px 10px;
+}
+#main_menu_list li:hover {
+    background: #dddddd;
+}
+#main_menu_list li a {
+    color: inherit;
+    font-weight: bold;
+    text-decoration: none;
+}
+#main_menu_displayed {
+    position: absolute;
+    background: white;
+    border: 1px solid black;
+    top: 45px;
+    right: 10px;
+}
+
+
+input[type="button"], input[type="submit"] {
+    cursor: pointer;
+    color: white;
+    font-family: sans-serif;
+    font-weight: bold;
+    background-color: black;
+    border: none;
+    padding: 3px 6px;
+    font-size: 1em;
+}
+
+label.required {
+    font-weight: bold;
+}
+#right_panel > div {
+    margin: 10px;
+}
+
+#one_panel > div {
+    margin: 10px;
+}
+
+input {
+    border: 1px solid black;
+    font-size: 1.3em;
+}
+
+textarea {
+	border: 1px solid black;
+    font-family: sans-serif;
+    font-size: 1.1em;
+}
+
+.r2b_field_row {
+    margin-bottom: 15px;
+}
+
+ul.r2b_errors {
+    color: #FF0000;
+    font-weight: bold;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+.r2b_errors > li:before {
+    content: "! ";
+}
+
+ul.r2b_errors > li {
+    line-height: 20px;
+    margin-bottom: 5px;
+    padding-left: 0;
+}
+
+label.error {
+    color: #FF0000;
+}
+
+.r2b_ro_value {
+    background: none repeat scroll 0 0 #D3D3D3;
+    border: 1px solid #000000;
+    display: inline-block;
+    height: 1.7em;
+    line-height: 1.7em;
+    overflow: hidden;
+    font-size: 1.15em;
+}
+
+.search_bar {
+    margin: 10px;
+    position:relative;
+    height: 1.6em;
+}
+input.search {
+    border: 1px solid #000000;
+    float: left;
+    font-family: inherit;
+    font-size: 1.5em;
+    height: 1em;
+    width: 70%;
+    width: calc(100% - 72px);
+    box-sizing: content-box;
+}
+
+.new_btn {
+    background: url("/static/mp/img/plus.png") no-repeat scroll 5px 3px #000000 !important;
+    background-size: 20px;
+    margin-left: 8px;
+}
+
+.search_btn, .new_btn {
+    background: url("/static/mp/img/search-white.png") no-repeat scroll 3px 3px  #000000;
+    background-size: 20px; 
+    float: left;
+    height: 28px;
+    width: 30px;
+    cursor:pointer;
+}
+
+
+div#footer_line {
+    color:#808080;
+    margin: 10px auto 5px;
+    text-align: center;
+    width: 600px;
+   
+}
+
+
+#footer_line > ul {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+#footer_line > ul li a {
+    color: #808080;
+    text-decoration: none;
+}
+#footer_line > ul li {
+    display: inline;
+    margin-right: 5px;
+    padding-right: 5px;
+    border-right: solid 2px lightgray;
+}
+#footer_line > ul li:last-child {
+    border-right: none;
+}
+
+
+table#import_table td {
+	border: 1px solid; 
+}
+table#import_table th {
+	border 2px solid;
+	background-color: grey;
+}
+
+table#import_table tr.subheader {
+	text-align: center;
+}
+
+
+table#import_table tr.line {
+	font-size:80%;
+}
+
+.banner1 {
+    font-size: 150%;
+    height: 360px;
+    left: 50%;
+    margin: -180px 0 0 -200px !important;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 400px;
+}
+
+.banner1 h2 {
+    color: #D3D3D3;
+    font-size: 100%;
+}
+
+ul.list {
+    
+    list-style: none outside none;
+    margin: 15px 10px;
+    padding: 0;
+}
+
+ul.list .title {
+    font-size: 1.3em;
+    font-weight: bold;
+    padding-left: 33px;
+    cursor: pointer;
+    background: url("/static/mp/img/abullet.png") no-repeat scroll 8px 3px;
+    background-size: 16px auto;
+    max-width: 80%;
+    max-width: calc(100% - 110px);
+    display:block;
+}
+
+ul.list .title.expanded {
+	 background: url("/static/mp/img/abullet-down.png") no-repeat scroll 8px 3px;
+	 background-size: 16px auto;
+}
+ul.list li {
+    margin-bottom: 10px;
+    border-bottom: 1px solid lightgrey;
+    padding-bottom: 2px;
+}
+
+.list_footer > a {
+    background: none repeat scroll 0 0 #000000;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: block;
+    float: left;
+    font-size: 1.3em;
+    margin: 5px 15px;
+    padding: 3px 6px;
+}
+
+.list_footer > a.next {
+	float:right;
+}
+
+.item-detail .counter {
+    background: none repeat scroll 0 0 #000000;
+    color: #FFFFFF;
+    float: left;
+    font-weight: bold;
+    margin-right: 10px;
+    padding: 0 3px;
+    text-align: center;
+    cursor:pointer;
+}
+.item-detail .number {
+    font-size: 120%;
+}
+.item-detail .label-small {
+    font-size: 80%;
+}
+.item-detail p {
+    font-style: italic;
+}
+
+.item-detail .group-details {
+	min-height:37px;
+}
+
+.small_btn {
+    float: right;
+    height: 32px;
+    margin-left: 5px;
+    position: relative;
+    top: -7px;
+    width: 32px;
+    cursor:pointer;
+}
+
+form .small_btn {
+    display: inline-block;
+    float: none;
+    top: 4px;
+}
+
+.r2b_form input:not([type="button"]), .r2b_form textarea, .r2b_ro_value {
+    width: 80%;
+}
+
+.r2b_form textarea {
+	height:4em;
+
+	}
+
+
+.map_btn {
+    background: url("/static/mp/img/map.svg") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+    background-size: 33px auto;
+}
+
+.edit_btn {
+    background: url("/static/mp/img/edit.svg") no-repeat scroll 0 3px rgba(0, 0, 0, 0);
+    background-size:26px auto;
+}
+
+.dialog {
+	 background: none repeat scroll 0 0 #FFFFFF;
+   border: 1px solid #000000;
+   left: 50%;
+   position: absolute;
+    text-align: center;
+    top: 50%;
+    z-index: 99;
+}
+
+.dialog.small {
+    height: 80px;
+    margin: -40px -100px;
+    width: 200px;
+}
+
+.position {
+    float: left;
+    font-size: 1.1em;
+    padding-left: 15px;
+    background: url('/static/mp/img/map_marker.svg') no-repeat 0 0;
+    background-size: 10px auto;
+    margin-bottom: 5px;
+    font-family: monospace;
+}
+.place_link {
+    background: url("/static/mp/img/ext_link.svg") no-repeat scroll 1px 1px rgba(0, 0, 0, 0);
+    background-size:30px;
+    display: block;
+    float: right;
+    height: 32px;
+    width: 32px;
+}
+.address {
+    clear: left;
+    padding-left: 19px;
+    background: url('/static/mp/img/envelope.svg') no-repeat 0 0;
+    background-size: 17px;
+}
+.place_detail {
+    clear: both;
+    margin-left: 35px;
+}
+
+#place_editor {
+    margin: 15px;
+}
+
+.r2b_widget_popup {
+    border: 1px dashed #000000;
+    margin: 30px;
+    padding: 10px;
+    position: relative;
+}
+
+.r2b_small_btn {
+    border: 1px solid #000000;
+    height: 32px;
+    position: absolute;
+    width: 32px;
+}
+.r2b_close_btn {
+    background: url("/static/mp/img/close.svg") no-repeat scroll 1px 1px #FFFFFF;
+    background-size: 30px;
+    right: -1px;
+    top: -1px;
+}
+.r2b_done_btn {
+    background: url("/static/mp/img/check_mark.svg") no-repeat scroll 1px 1px #FFFFFF;
+    background-size: 30px;
+    top: -1px;
+    right: 38px;
+}
+
+
+@media only screen and (max-width: 480px) {
+.r2b_form input:not([type="button"]), .r2b_form textarea, .r2b_ro_value {
+	 
+    width: 85%;
+    width: calc(100% - 46px);
+}
+
+.r2b_widget_popup {
+    margin: 8px;
+    padding: 16px 10px 10px;
+	}
+	
+.place_detail {
+    margin-left: 12px;
+}
+
+}

@@ -1,0 +1,107 @@
+{%extends 'base.html'%}
+{% load url from future %}
+{% load i18n %} 
+{% load headers_mapping%}
+{%block title%}
+{% trans 'Import Places' %}
+{%endblock%}
+{%block head_script%}
+<script type="text/javascript" src="{{STATIC_URL}}js/socket.io.js"></script>
+<script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog'  packages='myplaces'%}"></script>
+<script type="text/javascript">
+<!--
+var log=null;
+function submitForm() {
+	$('#submit_btn').prop('disabled',true);
+	var streamId='{{stream_id}}';
+	var form=$('#col_mapping_form');
+	var errors=$('ul.errors');
+	errors.empty();
+	
+	var postForm=function() {
+		$.ajax(form.attr('action'), {
+			method:'POST',
+			data:form.serialize(), 
+			success:function (data, status, resp){
+		  if (data.errors){
+			  for (var i=0;i<data.errors.length; i+=1) {
+				  errors.append($('<li>').append(data.errors[i]));
+				  
+			  }
+			  $('#submit_btn').attr('disabled', false);
+		  }
+		  else {
+			  $('#form_section').hide();
+			  $('#results').show();
+		  }
+	},
+	 error:function(req, status){
+		 alert(gettext('Server Error: '+status));
+		 $('#submit_btn').attr('disabled', false);
+	 }});
+	};
+	
+	var createLog=function() {
+		log=io.connect('/log', {reconnect:false});
+		log.on('connect', function() {
+			log.emit('start', streamId)
+			postForm();
+		});
+
+		log.on('progress', function(msg) {
+			$('#results #main_message').html(gettext('Line ')+ msg.line+ gettext(' imported'))
+		});
+		
+		log.on('error',function (msg) {
+			$('#results #messages').append($('<li>').text(gettext('Line ')+msg.line+' : '+msg.msg))
+		});
+		
+		log.on('done', function(msg) {
+			$('#results #main_message').append('<br>').append(gettext('Import finished'));
+		});
+	}
+	
+	if (!log) {
+		createLog()
+	}
+	else {
+		postForm()
+	}
+	
+}
+//-->
+</script>
+{%endblock%}
+{%block body%}
+<h1>{%blocktrans%}Import Places - Step {{step}}{%endblocktrans%}</h1>
+<div id="form_section">
+<p class="form_help">
+{%blocktrans%}
+Now map columns in CSV file to appropriate fields in MyPlaces database<br>
+{%endblocktrans%}
+</p>
+
+<ul class='errors'></ul>
+<form method="POST" action="{%url 'upload-places' step%}" id="col_mapping_form">
+<input type="hidden" name="step_1" value="{{step_1}}"/>
+ {% csrf_token %}
+  <table class="form_table">
+  <tr><td>
+	<table id="import_table">
+	<tr>{%for h in headers%}<th>{{h}}</th>{%endfor%}</tr>
+	<tr class="subheader">{%for l in max_lens%}<td>{{l}}</td>{%endfor%}</tr>
+	<tr class="mapping">{%headers_mapping%}
+	</tr>
+	{%for r in sample_lines%}<tr class="line">{%for c in r%}<td>{{c}}</td>{%endfor%}</tr>{%endfor%}
+	</table>
+	</td></tr>
+	<tr><td><input type="button" value="Import" onclick="submitForm()" id='submit_btn'/></td></tr>
+	</table>
+</form>
+</div>
+<div id='results' style="display: none;">
+<p id='main_message'>{%trans 'Import process started'%}</p>
+<ul id='messages'>
+</ul>
+</div>
+{%endblock%}

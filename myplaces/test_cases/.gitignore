@@ -1,0 +1,10 @@
+/__init__.pyc
+/pivovary_data.pyc
+/test_api.pyc
+/test_general.pyc
+/test_geocode.pyc
+/test_imports.pyc
+/test_models.pyc
+/test_remote.pyc
+/test_views.pyc
+/test_voronoi.pyc

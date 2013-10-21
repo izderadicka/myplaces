@@ -1,0 +1,17 @@
+{% load url from future %}
+<!DOCTYPE HTML>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=false">
+	<title>{%block title%}{%endblock%}</title>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}mp/css/style.css"/>
+	<script src="{{STATIC_URL}}js/jquery-2.0.2.js"></script>
+	<script  src="{% url 'django.views.i18n.javascript_catalog'  packages='myplaces'%}"></script>
+	{%block head_script%}
+	{%endblock%}
+</head>
+<body>
+	{%block body%}
+	{%endblock%}
+	
+</body>
