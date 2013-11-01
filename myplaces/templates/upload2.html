@@ -1,22 +1,25 @@
-{%extends 'base.html'%}
+{%extends 'upload_base.html'%}
 {% load url from future %}
 {% load i18n %} 
 {% load headers_mapping%}
-{%block title%}
-{% trans 'Import Places' %}
-{%endblock%}
 {%block head_script%}
 <script type="text/javascript" src="{{STATIC_URL}}js/socket.io.js"></script>
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog'  packages='myplaces'%}"></script>
 <script type="text/javascript">
 <!--
-var log=null;
+var log=null,
+firstAttempt=null;
 function submitForm() {
 	$('#submit_btn').prop('disabled',true);
 	var streamId='{{stream_id}}';
 	var form=$('#col_mapping_form');
-	var errors=$('ul.errors');
+	var errors=$('ul.r2b_errors');
 	errors.empty();
+	
+	if (firstAttempt && (new Date()-firstAttempt) > 3600000) {
+		alert(gettext('Page has expired, close it and start again'));
+		return;
+	}
 	
 	var postForm=function() {
 		$.ajax(form.attr('action'), {
@@ -33,6 +36,7 @@ function submitForm() {
 		  else {
 			  $('#form_section').hide();
 			  $('#results').show();
+			  $('#main_message').text(gettext('Import Started'));
 		  }
 	},
 	 error:function(req, status){
@@ -49,7 +53,11 @@ function submitForm() {
 		});
 
 		log.on('progress', function(msg) {
-			$('#results #main_message').html(gettext('Line ')+ msg.line+ gettext(' imported'))
+			$('#progress .counter').text(msg.line);
+			$('#progress .total').text(msg.total);
+			var progress=Math.round(100*msg.line/msg.total);
+			$('#progress .bar').css('width', progress+'%')
+			
 		});
 		
 		log.on('error',function (msg) {
@@ -57,12 +65,14 @@ function submitForm() {
 		});
 		
 		log.on('done', function(msg) {
-			$('#results #main_message').append('<br>').append(gettext('Import finished'));
+			$('#results #main_message').text(gettext('Import finished'));
+			$('#progress .bar').css('width', '100%');
 		});
 	}
 	
 	if (!log) {
-		createLog()
+		createLog();
+		firstAttempt=new Date();
 	}
 	else {
 		postForm()
@@ -72,8 +82,7 @@ function submitForm() {
 //-->
 </script>
 {%endblock%}
-{%block body%}
-<h1>{%blocktrans%}Import Places - Step {{step}}{%endblocktrans%}</h1>
+{%block content%}
 <div id="form_section">
 <p class="form_help">
 {%blocktrans%}
@@ -81,12 +90,12 @@ Now map columns in CSV file to appropriate fields in MyPlaces database<br>
 {%endblocktrans%}
 </p>
 
-<ul class='errors'></ul>
+<ul class='r2b_errors'></ul>
 <form method="POST" action="{%url 'upload-places' step%}" id="col_mapping_form">
 <input type="hidden" name="step_1" value="{{step_1}}"/>
  {% csrf_token %}
-  <table class="form_table">
-  <tr><td>
+
+ <div id="mapping_table">
 	<table id="import_table">
 	<tr>{%for h in headers%}<th>{{h}}</th>{%endfor%}</tr>
 	<tr class="subheader">{%for l in max_lens%}<td>{{l}}</td>{%endfor%}</tr>
@@ -94,14 +103,25 @@ Now map columns in CSV file to appropriate fields in MyPlaces database<br>
 	</tr>
 	{%for r in sample_lines%}<tr class="line">{%for c in r%}<td>{{c}}</td>{%endfor%}</tr>{%endfor%}
 	</table>
-	</td></tr>
-	<tr><td><input type="button" value="Import" onclick="submitForm()" id='submit_btn'/></td></tr>
-	</table>
+	</div>
+{%if group_exists%}
+<div id="import_type_selector" class="r2b_field_row">
+<label for="id_update_type">{%trans 'How to update existing places:'%}</label>
+<select name="update_type" id="id_update_type">
+<option value="skip">{%trans 'Skip existing places and import only new'%}</option>
+<option value="update">{%trans 'Update existing places and import new'%}</option>
+<option value="remove">{%trans 'Remove all existing places within group and import new'%}</option>
+</select>
+</div>
+{%endif%}
+<input type="button" value="Import" onclick="submitForm()" id='submit_btn'/>
 </form>
 </div>
 <div id='results' style="display: none;">
-<p id='main_message'>{%trans 'Import process started'%}</p>
-<ul id='messages'>
-</ul>
+<p id='main_message'>{%trans 'Waiting to start ...'%}</p>
+<div id="progress">
+<div class="bar"><div>{%trans 'Line: '%}<span class="counter"></span>/<span class="total"></span></div>
+</div></div>
+<ul id='messages'  class="r2b_errors"></ul>
 </div>
 {%endblock%}

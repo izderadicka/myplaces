@@ -1,3 +1,4 @@
+# coding=utf-8
 '''
 Created on Jun 14, 2013
 
@@ -8,31 +9,146 @@ import logging
 import types
 from urllib2 import URLError
 import time
-import threading
+from myplaces import remote
+import zmq
 log=logging.getLogger('mp.geocode')
 import re
 import json
 from geopy import geocoders, util 
 from geopy.geocoders.base import GeocoderError
 from django.contrib.gis.geos import Point
-
 from models import Address
 
 
-gcoders=[geocoders.GoogleV3(), geocoders.OpenMapQuest()]
+class CoderMixin(object):
+    def address_to_string(self,adr):
+        if not isinstance(adr, types.StringTypes):
+            adr=unicode(adr)
+            if not adr:
+                raise ValueError('empty address')   
+        return adr
+    
+    def try_be_smart(self,address, original_address):
+        # Try to locate at least approximately - e.g. remove first address segment and try again
+        address=map(lambda s: s.strip(),re.split(r'[,;]', address))
+        if len(address)>2:
+                address=', '.join(address[1:])
+                return address
+        
+        return None
+        
+    def reverse(self, point):
+        places=super(CoderMixin, self).geocode(point, exactly_one=False)
+        if places:
+            return places[0]
+        raise NotFound
+    def geocode (self, adr):
+        address=self.address_to_string(adr)
+        while True:
+            try:
+                places=super(CoderMixin, self).geocode(address, exactly_one=False)
+                break
+            except NotFound:
+                
+                address= self.try_be_smart(address, adr)
+                if not address:
+                    raise NotFound
+            except (ValueError, URLError, IOError),e:
+                log.error('Geocode service error - %s', e)
+                raise ServiceError('Geocode service error - %s' % str(e))
+        #sanity check - found address should be in city(or county for huge cities like London) provided.
+        for  p in places:
+            
+            if (p[0].city and p[0].city.lower() in address.lower()) or \
+               (p[0].county and p[0].county.lower() in address.lower()):
+                return p
+        #else return what we got
+        if places:
+            return places[0]
+        raise NotFound
+    
+class NominatimAddressAdapter(object):
+    def __init__(self, address):
+        self.a=address
+        
+    def _apply_fixes(self, string, fixes):
+        if not string:
+            return string
+        for regexp, replace in fixes:
+            regexp=re.compile(regexp, re.IGNORECASE| re.UNICODE)
+            if regexp.search(string):
+                string= regexp.sub(replace,string)
+        return string
+    
+    
+    def fix_country(self):
+        return self.a.country
+    CITY_FIXES=[(ur'^(.+)\s+(\d{1,2})(?=$|\s)', r'\1'),
+                (ur'^(.+)\s+([IVX]{1,5})$', r'\1'),
+                (ur'\s(n\.)(?=\s)', '')]
+    def fix_city(self, ext=None):
+        city=ext or self.a.city
+        return self._apply_fixes(city, self.CITY_FIXES)
+    
+    ONE_LETTER=re.compile(r'(?<=\s)([^\W\d_]\.)|^([^\W\d_]\.)', re.UNICODE)
+    STREET_FIXES=[(ur'nám\.', ''),
+                  (ur'ul\.', ''),
+                  (ur'nábř\.', ''),
+                  (ur'tř\.', ''),
+                  (ur'ulice', '')]
+    def fix_street(self, ext=None):
+        street=ext or self.a.street
+        street=self._apply_fixes(street, self.STREET_FIXES)
+        clean=self.ONE_LETTER.sub('',street).strip()
+        if clean:
+            street=clean
+        return street
+    
+    PC_FIX=re.compile(r'(^|\s)(\d{3} \d{2})(\s|$)')      
+    def __unicode__(self):
+        if self.a.street or self.a.city:
+            adr=[]
+            for field in ('street', 'city', 'country'):
+                s=getattr(self, 'fix_'+field)() if hasattr(self,'fix_'+field) else None
+                if s:
+                    adr.append(s)
+            return u', '.join(adr)
+        else:
+            string= self.a.unformatted
+            if not string:
+                return ''
+            adr=map(lambda s: s.strip(), re.split(r'[,;]', string))
+            length=len(adr)
+            res=[]
+            for i,seg in enumerate(adr):
+                if length>1 and i==0:
+                    seg=self.fix_street(seg)
+                if length>1 and i>0:
+                    #TODO - this is temporary fix for CZ postal codes
+                    seg=self.PC_FIX.sub('', seg)
+                    seg=self.fix_city(seg)
+                
+                if seg:
+                    res.append(seg)
+            return u', '.join(res)
+        
 
-class OSMNominatim(geocoders.OpenMapQuest):
+class OSMNominatim(CoderMixin, geocoders.OpenMapQuest):
     def __init__(self, format_string='%s'):
         super(OSMNominatim, self).__init__(format_string=format_string)
         self.url='http://nominatim.openstreetmap.org/search.php?format=json&addressdetails=1&%s'
-    PC_FIX=re.compile(r'(\d{3}) (\d{2})')    
-    def geocode(self, string, exactly_one=True):
+    
+    def address_to_string(self,adr): 
+        if isinstance(adr, Address):
+            adapter=NominatimAddressAdapter(adr)
+        elif isinstance(adr, types.StringTypes):
+            adapter=NominatimAddressAdapter(Address(unformatted=adr))
+        else:
+            raise ValueError('Invalid address type %s' % type(adr))
+        string=unicode(adapter)
         if not string:
-            raise ValueError('empty address')
-           
-        #fix CZ postal codes for search
-        string=OSMNominatim.PC_FIX.sub('\1\2', string)
-        return geocoders.OpenMapQuest.geocode(self, string, exactly_one=exactly_one)
+                raise ValueError('Empty address')   
+        return string
     
     def parse_json(self, page, exactly_one=True):
         """Parse address, latitude, and longitude from an JSON response."""
@@ -55,7 +171,7 @@ class OSMNominatim(geocoders.OpenMapQuest):
         address = resource['address']
         log.debug('Matched address is %s', address)
         parsed_address=Address()
-        street=address.get('road') or address.get('pedestrian')
+        street=address.get('road') or address.get('pedestrian') or address.get('village') or address.get('hamlet')
         if address.get('house_number') and street:
             street+=' '+address['house_number']
         parsed_address.street=street
@@ -73,21 +189,12 @@ class OSMNominatim(geocoders.OpenMapQuest):
         
         return (parsed_address, (latitude, longitude))
         
-class Google(geocoders.GoogleV3):   
+class Google(CoderMixin, geocoders.GoogleV3):   
     REQUESTS_LIMIT=0.2
     def __init__(self, *args, **kwargs):
         super(Google,self).__init__(*args, **kwargs)
-        self.last_request=0
-       
         
-    def geocode_url(self, url, exactly_one=True):
-        time_from_prev_call= time.time() - self.last_request
-        #HACK: This is bit stupid way to try to keep certain limit of requests per minute
-        while  time_from_prev_call < Google.REQUESTS_LIMIT:
-            time.sleep(Google.REQUESTS_LIMIT-time_from_prev_call)
-            time_from_prev_call= time.time() - self.last_request
-        self.last_request=time.time()
-        return geocoders.GoogleV3.geocode_url(self, url, exactly_one=exactly_one)
+    
     def parse_json(self, page, exactly_one=True):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
@@ -147,32 +254,58 @@ _gcoders=[None, None]
 def _get_geocoder_instance(alternate_geocoder=False):
     if alternate_geocoder:
         if not _gcoders[1]:
-            _gcoders[1]=OSMNominatim()
+            _gcoders[1]=Google()
         return _gcoders[1]
     else:
         if not _gcoders[0]:
-            _gcoders[0]=Google()
+            _gcoders[0]=OSMNominatim()
         return _gcoders[0]
 
-def get_coordinates(address, alternate_geocoder=False, allow_approximate=True):
-    if not isinstance(address, types.StringTypes):
-        address=unicode(address)
+def get_coordinates(address, alternate_geocoder=False):
+   
     gcoder=_get_geocoder_instance(alternate_geocoder)
-    while True:
-        try:
-            places=gcoder.geocode(address, exactly_one=False)
-            break
-        except NotFound:
-            # Try to localte at least approximatelly - e.g. remove first address segment and try again
-            address=map(lambda s: s.strip(),re.split(r'[,;]', address))
-            if len(address)>2 and allow_approximate:
-                address=', '.join(address[1:])
-            else:
-                raise NotFound('Address %s not found on map'%address )
-        except (ValueError, URLError, IOError),e:
-            log.error('Geocode service error - %s', e)
-            raise ServiceError('Geocode service error - %s' % str(e))
-        
-    address, (lat, lng)=places[0]
+    place=gcoder.geocode(address)
+    address, (lat, lng)=place
     
     return address, Point(lng, lat, srid=4326)
+
+
+@remote.is_remote
+def geocode_remote(adr, alternate=False, reverse=False, timer=None):
+    #throttle requests to geocoding service
+    if timer:
+        nr=timer.get('next_run') or time.time()
+        wait=nr-time.time()
+        while wait>0:
+            time.sleep(wait)
+            wait=nr-time.time()
+            
+    gcoder=_get_geocoder_instance(alternate)
+    try:
+        place=gcoder.geocode(adr) if not reverse else gcoder.reverse(adr)
+    except NotFound:
+        place= None, (None, None)
+    if timer:
+        delay=gcoder.REQUESTS_LIMIT if hasattr(gcoder, 'REQUESTS_LIMIT') else 0
+        timer['next_run']=time.time()+delay
+    return place
+
+
+GC_ADDR='tcp://127.0.0.1:10009'  
+def get_coordinates_remote(adr, alternate=False, reverse=False, context=None):      
+    ctx=context or remote.context()   
+    socket=ctx.socket(zmq.REQ)  
+    socket.connect(GC_ADDR)
+    
+    pos=remote.call_remote(socket, 'geocode_remote', (adr, alternate, reverse),  timeout=60)
+    
+    if not pos[0]:
+        raise NotFound
+    
+    address, (lat, lng)=pos
+    return address, Point(lng, lat, srid=4326)
+
+def get_address_remote(location, alternate=False, context=None):
+    return get_coordinates_remote(location, alternate, True, context)
+    
+    

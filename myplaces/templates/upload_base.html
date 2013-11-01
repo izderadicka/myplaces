@@ -1,0 +1,20 @@
+{%extends 'base.html'%}
+{% load i18n %} 
+{%block title%}
+{% trans 'Import Places' %}
+{%endblock%}
+{%block body%}
+<section id="header">
+<div id="top_bar">
+<div><span id="logo">MyPlaces</span></div>
+
+</div>
+</section>
+<section id="main">
+<div id="content" class="import_form">
+<h1>{%blocktrans%}Import Places - Step {{step}}{%endblocktrans%}</h1>
+{%block content%}
+{%endblock%}
+</div>
+</section>
+{%endblock%}

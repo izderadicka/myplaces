@@ -360,7 +360,7 @@ form .small_btn {
     top: 4px;
 }
 
-.r2b_form input:not([type="button"]), .r2b_form textarea, .r2b_ro_value {
+.r2b_form input:not([type="button"]):not([type="submit"]):not([type="checkbox"]), .r2b_form textarea, .r2b_ro_value {
     width: 80%;
 }
 
@@ -454,6 +454,44 @@ form .small_btn {
     right: 38px;
 }
 
+.import_form {
+    margin: 0 15px;
+}
+form#import_start_form {
+	max-width: 700px;
+}
+.import_form h1 {
+    border-bottom: 1px solid lightgray;
+}
+
+#mapping_table {
+	overflow: auto;
+	margin-bottom: 15px;
+}
+
+#results #progress {
+    border: 1px solid #000000;
+    width: 700px;
+    margin-bottom: 1em;
+}
+
+#progress .bar {
+    background: none repeat scroll 0 0 #D3D3D3;
+    line-height: 1em;
+    overflow: visible;
+    
+    width: 0;
+}
+
+#progress .bar > div {
+	width:200px;
+	padding: 2px;
+	}
+
+#results #main_message {
+    font-size: 1.3em;
+    font-weight: bold;
+}
 
 @media only screen and (max-width: 480px) {
 .r2b_form input:not([type="button"]), .r2b_form textarea, .r2b_ro_value {

@@ -6,7 +6,6 @@ from django.utils.translation import ugettext as _
 from django.views.generic import  ListView
 from django.views.generic.edit import UpdateView
 from django.contrib.gis.geos import Point
-
 import logging
 from django.http import HttpResponse, HttpResponseBadRequest,\
     HttpResponseNotFound
@@ -17,27 +16,27 @@ from myplaces.models import PlacesGroup, Place
 from myplaces.voronoi import voronoi2
 log=logging.getLogger('mp.views')
 from django.views.decorators.csrf import csrf_exempt
-
+import django_mobile
 import implaces
 import utils
 import remote
 
-from sockets import ctx as zmq_ctx
 
 def rr(request, template, ctx):
     return render_to_response(template, ctx, context_instance=RequestContext(request))
 def rjson(ctx):
     return HttpResponse(json.dumps(ctx), mimetype="application/json")
 
-
 def upload_places(request, step):
-    
+    flavour=django_mobile.get_flavour(request, 'full')
+    if flavour!='full':
+        return HttpResponse('Import is designed to work only in full browser, not mobile', 'text/plain', 400)
     step=int(step)
     if step==1:
         if request.method=='GET':
             form=forms.ImportForm(initial={'call_id':utils.gen_uid()})
         elif request.method=='POST':
-            form=forms.ImportForm(request.POST, request.FILES)
+            form=forms.ImportForm(request.POST, request.FILES, user=request.user)
             if form.is_valid():
                 return _upload_places_2(request, step+1, form)
         return rr(request, 'upload1.html', {'form':form, 'step':step})
@@ -49,6 +48,7 @@ def _upload_places_2(request,step, form):
     log.debug('CSV temporary file %s',tmp_file)
     form=form.cleaned_data
     form['csv_file']=tmp_file 
+    group_exists=PlacesGroup.objects.filter(name=form['name']).count()
     headers, max_lens, sample_lines=implaces.extact_headers(tmp_file)
     return rr(request, 'upload2.html', {'headers':headers, 'max_lens': max_lens, 
 										'sample_lines':sample_lines, 'step':step,
@@ -56,10 +56,12 @@ def _upload_places_2(request,step, form):
                                         'stream_id': tmp_file,
 										'mappable_fields':implaces.get_mappable_fields(),
                                         'values':{}, 
+                                        'group_exists':group_exists
                                          })
       
 def _upload_places_fin(request, step):
     form=utils.deserialize(request.POST.get('step_1'))
+    existing=request.POST.get('update_type') or 'skip'
     mapping, values, errors =implaces.extract_mapping(request.POST)
         
     if errors: 
@@ -67,12 +69,13 @@ def _upload_places_fin(request, step):
     tmp_file=form.get('csv_file')
     del form['csv_file']
     socket=None
+    zmq_ctx=remote.context()
     try:
         socket=remote.create_socket(zmq_ctx, 'client', 0)
         try:
             remote.call_remote(socket, 'import_places', [tmp_file, tmp_file, mapping, form.get('name'), 
                      form.get('description'), form.get('private'), 
-                     request.user], call_id=form.get('call_id'))
+                     request.user, existing], call_id=form.get('call_id'))
         except remote.RemoteError, e:
             return rjson({'errors':[_('Remote Error (%s)')% str(e)]})
     finally:

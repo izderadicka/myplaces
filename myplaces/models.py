@@ -76,6 +76,9 @@ class PlacesGroup(Auditable):
     class Meta:
         verbose_name=_('Places Group')
         verbose_name_plural=_('Places Groups')
+        permissions = (
+            ("import_placesgroup", "Can import places data from CSV"),
+        )
     
 class Address(Auditable):
     street=models.CharField(_('Street'), max_length=80, null=True, blank=True)
@@ -114,6 +117,7 @@ class Place(Auditable):
     group=models.ForeignKey(PlacesGroup, blank=False, null=False, related_name="places", 
                             verbose_name=_('Group'))
     position=models.PointField(_('Coordinates'), srid=4326, null=False, blank=False)
+    #TODO: Change to OnetoOneFields - this will require chnange of test data
     address=models.ForeignKey(Address, related_name="places", verbose_name=_('Address'),null=True, blank=True)
     url=models.URLField(_('WWW Link'), max_length=400, null=True, blank=True )
     

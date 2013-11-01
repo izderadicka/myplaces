@@ -125,6 +125,12 @@ class PlacesSerializer(BaseSerializer):
     address_string=rest_framework.relations.RelatedField(source='address')
     description=fields.CharField(widget=widgets.Textarea, label=_('Description'), max_length=200, required=False)
     group= rest_framework.relations.PrimaryKeyRelatedField(widget=widgets.HiddenInput)
+    def validate_name(self, attrs, source):
+        name=attrs[source]
+        existing=Place.objects.filter(name=name, group=attrs['group'])
+        if len(existing)>0:
+            raise rest_framework.serializers.ValidationError(_('Place with same name  already exists in this collection'))
+        return attrs
     class Meta:
         model= Place
         fields=['id', 'position', 'name',  'address', 'address_string', 'url', 'description', 'group', 'is_mine']
@@ -180,6 +186,12 @@ class GroupsFilter(django_filters.FilterSet):
 class GroupsSerializer(BaseSerializer):
     count=CountField(source='places', label=_('Count of Places'))
     description=fields.CharField(widget=widgets.Textarea, label=_('Description'), max_length=200, required=False)
+    def validate_name(self, attrs, source):
+        name=attrs[source]
+        existing=PlacesGroup.objects.filter(name=name, private=False).exclude(created_by=self.context['request'].user)
+        if len(existing)>0:
+            raise rest_framework.serializers.ValidationError(_('Collection with same name is already created by someone else'))
+        return attrs
     class Meta:
         model=PlacesGroup
         fields=['id', 'name', 'description', 'private', 'is_mine', 'count']

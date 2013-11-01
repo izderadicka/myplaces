@@ -57,7 +57,7 @@ def poll_msg(socket, cb_fn, timeout=3600):
     poller=zmq.Poller()
     poller.register(socket, zmq.POLLIN)
     while True:
-        available=dict(poller.poll(timeout))
+        available=dict(poller.poll(timeout*1000))
         if available.get(socket)==zmq.POLLIN:
             stream_id, mtype, data=socket.recv_multipart()
             if cb_fn(stream_id, mtype, pickle.loads(data)):
@@ -77,21 +77,24 @@ class TimeoutError(RemoteError):
 
 ERROR_TAG='__ERROR__'
 BUSY_TAG='__BUSY__'
-def call_remote(socket, method, args, call_id=''):
+RESULT_TAG='__RES__'
+def call_remote(socket, method, args, call_id='', timeout=3):
     if isinstance(call_id, unicode):
         call_id=call_id.encode('utf-8') 
     socket.send_multipart((method, call_id, pickle.dumps(args)))
     poller=zmq.Poller()
     poller.register(socket, zmq.POLLIN)
-    ready=dict(poller.poll(3000))
+    ready=dict(poller.poll(timeout*1000))
     if ready and ready.has_key(socket):
         result, resp=socket.recv_multipart()
     else:
-        raise RemoteError('No response from server')
+        raise TimeoutError('No response from server')
     if result==ERROR_TAG:
         raise RemoteError(str(resp))
     elif result==BUSY_TAG:
         raise BusyError(str(resp))
+    elif result==RESULT_TAG:
+        resp=pickle.loads(resp)
     return resp
 
 _running={}
@@ -111,20 +114,30 @@ def _check_running(call_id):
         
     return len(children)
 
-def do_remote_call(socket):
-    def _err(msg):
+
+def do_remote_call(socket, new_proc=True, allowed_methods=None, extra_kwargs={}):
+    def _err(msg,e=None):
         socket.send_multipart((ERROR_TAG, msg))
         log.error(msg)
+        if e:
+            log.exception(str(e))
     method, call_id, args= socket.recv_multipart()
-    try:
-        running_processes=_check_running(call_id)
-    except AlreadyRunning:
-        _err('Process for call_id %s is already running'%call_id)
+    
+    if allowed_methods and method not in allowed_methods:
+        _err('Forbidden method %s'% method)
         return
-    if running_processes>=_PROCESS_LIMIT:
-        socket.send_multipart((BUSY_TAG, 'Reached process limit of %d'%_PROCESS_LIMIT))
-        log.info('Reached processes limit of %d'% _PROCESS_LIMIT)
-        return
+    
+    if new_proc:
+        try:
+            running_processes=_check_running(call_id)
+        except AlreadyRunning:
+            _err('Process for call_id %s is already running'%call_id)
+            return
+        if running_processes>=_PROCESS_LIMIT:
+            socket.send_multipart((BUSY_TAG, 'Reached process limit of %d'%_PROCESS_LIMIT))
+            log.info('Reached processes limit of %d'% _PROCESS_LIMIT)
+            return
+    
     fn=_REMOTE_METHODS.get(method)
     if not fn and not callable(fn):
         _err( 'Uknown method %s'%method)
@@ -138,16 +151,27 @@ def do_remote_call(socket):
     except Exception, e:
         _err( 'Error while deserializing args - %s'% str(e))
         return
-    try:
-        p=multiprocessing.Process(target=fn, args=args)
-        p.start()
-    except Exception,e:
-        _err('Error while starting process %s'%str(e))    
-    pid=p.pid
-    log.debug("Started process %d for %s(%s)", pid, method, args)
-    if call_id and pid:
-        _running[pid]=call_id
-    socket.send_multipart(('',str(pid)))
+    
+    if new_proc:
+        try:
+            p=multiprocessing.Process(target=fn, args=args, kwargs=extra_kwargs)
+            p.start()
+        except Exception,e:
+            _err('Error while starting process %s'%str(e))    
+        pid=p.pid
+        log.debug("Started process %d for %s(%s)", pid, method, args)
+        if call_id and pid:
+            _running[pid]=call_id
+        socket.send_multipart(('',str(pid)))
+        
+    else:
+        res=None
+        try:
+            res=fn(*args, **extra_kwargs)
+        except Exception, e:
+            _err('Function error: %s' % str(e), e)
+            return
+        socket.send_multipart((RESULT_TAG, pickle.dumps(res)))
         
 
 def run_proxy(context):   
@@ -187,8 +211,11 @@ def run_proxy2(ctx):
     t.setDaemon(True)
     t.start()
 
-def context():
-    return zmq.Context()
+def context(force_new=False):
+    if force_new:
+        return zmq.Context()
+    else:
+        return zmq.Context.instance()
 
 def create_socket(context,stype, linger=100):
     stype=stype.lower()
@@ -214,7 +241,7 @@ def create_socket(context,stype, linger=100):
 def process(token):
     # need new context after forking
     pid=str(os.getpid())
-    ctx=context()
+    ctx=context(True)
     pub=create_socket(ctx, 'pub')
     for i in range(10):
         time.sleep(0.1)

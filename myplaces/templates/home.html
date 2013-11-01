@@ -211,13 +211,15 @@ var siteFlavour='{{flavour}}';
 <li><a href="/login?next=%2Fmp">{%trans 'Login'%}</a></li>
 {%endif%}
 <li><a href="{%url 'home' %}">{%trans 'Reload'%}</a></li>
+{%if perms.myplaces.import_placesgroup and flavour == 'full'%}
 <li><a target="_blank" href="{%url 'upload-places' step=1%}">{%trans 'Import'%}</a></li>
-{% if user.is_authenticated %}
+{%endif%}
 {%if flavour == "full" %}
 <li><a href="{%url 'home' %}?flavour=mobile">{%trans 'Mobile Site'%}</a></li>
 {%else%}
 <li><a href="{%url 'home' %}?flavour=full">{%trans 'Full Site'%}</a></li>
 {%endif%}
+{% if user.is_authenticated %}
 <li><a href="/logout?next=%2Fmp">{%trans 'Logout'%}</a></li>
 {%endif%}
 </ul>

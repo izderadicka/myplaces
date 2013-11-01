@@ -12,7 +12,7 @@ import logging
 import re
 from collections import defaultdict
 from myplaces.geocode import get_coordinates
-from myplaces import geocode
+from myplaces import geocode, remote
 log=logging.getLogger('mp.implaces')
 from models import Place, Address, PlacesGroup
 from django.db import transaction
@@ -167,18 +167,25 @@ class LineError(Exception):
     
 def import_places(temp_file, mapping, name, description=None, private=False, 
                   user=None, existing='update', encoding='utf-8', 
-                  error_cb=None, progress_cb=None, **kwargs):
+                  error_cb=None, progress_cb=None, context=None):
     log.debug('Processing file %s with this mapping %s', temp_file, mapping)
     errors=[]
     def add_error(line, msg):
         errors.append(_('Line %d - %s') % (line, msg))
         if error_cb:
             error_cb(line, msg)
-    group, created= PlacesGroup.objects.get_or_create_ns(name=name)
+    exists=PlacesGroup.objects.filter(name=name, private=False).exclude(created_by=user).count()
+    if exists:
+        add_error(0, _('Collection with same name was created by other user'))
+        return
+    group, created= PlacesGroup.objects.get_or_create_ns(name=name, created_by=user)
     if created:
         group.description=description
         group.private=private
         group.save(user=user)
+    elif existing=='remove':
+        group.places.all().delete()
+    num_lines = sum(1 for _line in open(temp_file))
     with file(temp_file, 'rb') as f:
         reader=UnicodeReader(f, encoding=encoding)
         headers=reader.next()
@@ -205,17 +212,16 @@ def import_places(temp_file, mapping, name, description=None, private=False,
                 continue
             #------------------------------------------------------------
             try:
-                place=Place.objects.get(name=place_name)
+                place=Place.objects.get(name=place_name, group=group)
             except Place.DoesNotExist:
                 place=None
             if place and existing=='skip':
                 log.debug('Skipping line %d as existing', line)
-                continue
             if existing=='update' or not place:
                 try:
                     with transaction.commit_on_success():
                         if not place:
-                            place=Place(name=place_name)
+                            place=Place(name=place_name, group=group)
                         address=None
                         if mapping.get('address'):
                             address_data=dict([(name, l[mapping['address'][name]]) for name in mapping['address']])
@@ -223,7 +229,6 @@ def import_places(temp_file, mapping, name, description=None, private=False,
                         place.description=get_existing('description')
                         place.url=get_existing('url')
                         place.address=address
-                        place.group=group
                         pos_template=POINT_TEMPLATE
                         if mapping.has_key('position'):
                             pos=mapping['position']
@@ -250,12 +255,17 @@ def import_places(temp_file, mapping, name, description=None, private=False,
                         else:
                             #geocode from address
                             try:
-                                new_address,point=geocode.get_coordinates(address, allow_approximate=False)  
+                                new_address,point=geocode.get_coordinates_remote(address, context=context)
                             except geocode.NotFound:
                                 raise LineError( _('Cannot get location for address %s')% unicode(address)) 
-                                continue 
-                            except geocode.ServiceError, e:
-                                raise LineError( _('Geocoding Error (%s)')% str(e))
+                            except remote.TimeoutError:
+                                raise LineError(_('Geocoding process is not responding'))
+                            except remote.RemoteError, e:
+                                raise LineError( _('Geocoding process error (%s)')% str(e))
+#                             except geocode.ServiceError, e:
+#                                 raise LineError( _('Geocoding Error (%s)')% str(e))
+#                             except ValueError,e:
+#                                 raise LineError(_('Data Error (%s)')% str(e))
                             place.position=point
                         try:
                             place.save(user=user)
@@ -264,7 +274,7 @@ def import_places(temp_file, mapping, name, description=None, private=False,
                 except LineError,e:
                     add_error(line, e.message)
             if progress_cb:
-                progress_cb(line, None)        
+                progress_cb(line, num_lines)        
     
     return errors   
     

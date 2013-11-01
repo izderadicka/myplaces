@@ -50,15 +50,30 @@ class Address(AuditableModelForm):
         
         
 class ImportForm(Group):
+    error_css_class = 'error'
+    required_css_class = 'required'
+    
+    def __init__(self, *args, **kwargs):
+        if kwargs.has_key('user'):
+            self.user=kwargs.pop('user')
+        super(ImportForm,self).__init__(*args,**kwargs)
+        
+
     csv_file=forms.FileField(label=_('CSV File'), required=True)
-    call_id=forms.CharField(required=True, widget=forms.HiddenInput())
+    call_id=forms.CharField(required=True, widget=forms.HiddenInput(), label='')
+    description=forms.CharField(widget=forms.Textarea, required=False)
     def clean_csv_file(self):
         ext=os.path.splitext(self.cleaned_data['csv_file'].name)[1]
         if ext.lower()!='.csv':
             raise forms.ValidationError(_('Only .csv files can be imported'))
         return self.cleaned_data['csv_file']
     
-class ImportForm2(forms.Form):
-    pass
+    def clean_name(self):
+        name=self.cleaned_data['name']
+        existing=PlacesGroup.objects.filter(name=name, private=False).exclude(created_by=self.user)
+        if len(existing)>0:
+            raise forms.ValidationError(_('Collection with same name is already created by someone else'))
         
+        return self.cleaned_data['name']
+    
         

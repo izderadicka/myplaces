@@ -26,7 +26,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'mapy.views.home', name='home'),
     url(r'^api/', include(router.urls)),
     url(r'^import/(?P<step>\d+)/?$', 
-        permission_required('myplaces.add_placesgroup')(views.upload_places), name='upload-places'),
+        permission_required('myplaces.import_placesgroup', raise_exception=True)(views.upload_places), name='upload-places'),
     url(r'^map/?/(?P<group_id>\d+)/?(?P<place_id>\d+)?/?$', TemplateView.as_view(template_name='map.html')),
    
     url(r'^geojson/group/(?P<group_id>\d+)/?', views.group_geojson),
