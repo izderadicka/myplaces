@@ -12,7 +12,7 @@ from models import PlacesGroup
 from django.contrib.auth.decorators import login_required, permission_required
 
 from rest2backbone.resources import IndexedRouter
-from resources import PlacesViewSet, GroupsViewSet, AddressesViewSet
+from resources import PlacesViewSet, GroupsViewSet, AddressesViewSet, GeocodeReverse, Geocode
 from rest2backbone.views import restApi
 from rest2backbone.forms import FormFactory
 
@@ -25,6 +25,8 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'mapy.views.home', name='home'),
     url(r'^api/', include(router.urls)),
+    url(r'^api/geocode/?$', Geocode.as_view() ),
+    url(r'^api/geocode/reverse/?$', GeocodeReverse.as_view() ),
     url(r'^import/(?P<step>\d+)/?$', 
         permission_required('myplaces.import_placesgroup', raise_exception=True)(views.upload_places), name='upload-places'),
     url(r'^map/?/(?P<group_id>\d+)/?(?P<place_id>\d+)?/?$', TemplateView.as_view(template_name='map.html')),

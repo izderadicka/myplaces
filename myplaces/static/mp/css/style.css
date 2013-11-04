@@ -51,12 +51,24 @@ body {
     padding-left: 35px;
     background: url('/static/mp/img/map_marker.svg') no-repeat  6px 6px;
     background-size:  20px auto;
-    width: 150px;
+    width: 172px;
     padding-top: 3px;
+    display: block;
+    float: left;
+}
+
+#ajax_indicator {
+    background: url("/static/mp/img/spinning-wheel.gif") no-repeat scroll 0 4px rgba(0, 0, 0, 0);
+    background-size: 40px;
+    float: left;
+    height: 40px;
+    width: 40px;
+    display: none;
+    
 }
 #top_bar {
 	position:relative;
-	margin-bottom: 25px;
+	height: 3.5em;
 }
 #login {
     float: right;
@@ -452,6 +464,29 @@ form .small_btn {
     background-size: 30px;
     top: -1px;
     right: 38px;
+}
+
+.get_location_btn {
+    background: url("/static/mp/img/get_position.png") no-repeat scroll 1px 1px #FFFFFF;
+    background-size: 30px;
+}
+
+.get_address_btn {
+    background: url("/static/mp/img/get_address.png") no-repeat scroll 1px 1px #FFFFFF;
+    background-size: 30px;
+}
+
+.r2b_geocode_nav {
+    height: 32px;
+    margin: -11px 0;
+    position: relative;
+    width:80%;
+}
+.geobar {
+    left: 50%;
+    margin-left: -50px;
+    position: absolute;
+    width: 100px;
 }
 
 .import_form {

@@ -38,6 +38,10 @@ class CoderMixin(object):
         return None
         
     def reverse(self, point):
+        if isinstance(point, Point):
+            if point.srid and point.srid != 4326:
+                point=point.transform(4326, True)
+            point="%f,%f"% (point[1], point[0])
         places=super(CoderMixin, self).geocode(point, exactly_one=False)
         if places:
             return places[0]

@@ -26,7 +26,7 @@ MyPlaces
 <div class="screen_view">
 <section id="header">
 <div id="top_bar">
-<div><a href="#"><span id="logo">MyPlaces</span></a></div>
+<div><a href="#"><span id="logo">MyPlaces</span></a></div><div id="ajax_indicator"></div>
 {%if flavour == 'full' %}
 <div id="login">
 {%if user.is_authenticated  %}
@@ -201,8 +201,14 @@ MyPlaces
 </div>
 </div>
 </script>
-<script>
-var siteFlavour='{{flavour}}';
+
+<script type="text/template" id="geocode_bar">
+<div class="r2b_geocode_nav">
+<div class="geobar">
+<div class="get_location_btn small_btn"></div>
+<div class="get_address_btn small_btn"></div>
+</div>
+</div>
 </script>
 
 <script type="text/template" id="main_menu" >
@@ -226,6 +232,8 @@ var siteFlavour='{{flavour}}';
 </script>
 
 
-
+<script>
+var siteFlavour='{{flavour}}';
+</script>
 
 {%endblock%}

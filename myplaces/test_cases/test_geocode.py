@@ -10,6 +10,7 @@ import os,re
 from myplaces import geocode
 from myplaces.models import Address
 from myplaces.implaces import UnicodeReader
+from django.contrib.gis.geos.point import Point
 
 CSV_FILE=os.path.join(os.path.split(__file__)[0], './pivovary.csv')
 
@@ -112,6 +113,8 @@ class TestGeocode(unittest.TestCase):
              ]   
         
     def test_geocode_from_csv(self):
+        if NO<0:
+            return
         with file(self.samples[NO][0], 'rb') as f:
             reader=UnicodeReader(f)
             headers=reader.next()
@@ -162,11 +165,24 @@ class TestGeocode(unittest.TestCase):
         c= geocode.OSMNominatim()
         adr, p=c.reverse(pos)
         print adr, p
+        point=Point(14.3155932, 49.9506159, srid=4326)
+        adr2, p2=c.reverse(point)
+        
+        self.assertEqual(p,p2)
+        self.assertTrue(adr2.street,adr.street)
+        
+        point2=point.transform(3857, True)
+        
+        adr3, p3=c.reverse(point2)
+        
+        self.assertEqual(p,p3)
+        self.assertTrue(adr3.street,adr.street)
 
-                    
+
+NO=-1                  
 if __name__=='__main__':
+    NO=0 
     test='test_geocode2'
-    NO=0
     import sys
     if len(sys.argv)>1:
         test=sys.argv[1]

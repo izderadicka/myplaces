@@ -12,6 +12,9 @@ import threading
 import Queue
 import sys
 import unicodedata
+from django.contrib.gis.geos.point import Point
+import subprocess
+import os
 
 
 class Worker(threading.Thread):
@@ -93,6 +96,13 @@ class TestGeoRemote(unittest.TestCase):
     
     def setUp(self):
         remote.init()
+        manage=os.path.join(os.path.split(__file__)[0], '../../manage.py')
+        self.p=subprocess.Popen(['python', manage,  'process_server'], shell=False)
+    
+        
+    def tearDown(self):
+        self.p.kill()
+        
 
     def test_remote(self):
         a=Address(unformatted=u"nám. Legií 851, 530 02 Pardubice")
@@ -104,6 +114,14 @@ class TestGeoRemote(unittest.TestCase):
         pos= '49.9506159,14.3155932'
         adr, pos = geo.get_address_remote(pos)
         self.assertEqual(adr.city, u'Černošice')
+        pos=Point(14.3155932, 49.9506159, srid=4326)
+        adr, pos = geo.get_address_remote(pos)
+        self.assertEqual(adr.city, u'Černošice')
+        pos=Point(14.4179732,50.0879913, srid=4326)
+        adr, pos = geo.get_address_remote(pos)
+        print adr
+        self.assertTrue(adr.street.find(u'Kaprova')>-1)
+        
         
     def test_concurrent(self):
         

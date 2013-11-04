@@ -49,6 +49,17 @@ var myPlacesApp=(function() {
 			options=null;
 		};
 		
+		cache.update=function(model) {
+			if (list && list.get(model)) {
+				var oldModel=list.get(model);
+				if (model !== oldModel) {
+					var index=list.indexOf(oldModel);
+					list.remove(oldModel);
+					list.add(model, {at:index});
+				}
+			}
+		};
+		
 		return cache;
 	};
 	
@@ -125,6 +136,8 @@ var myPlacesApp=(function() {
 		afterSave: function() {
 			if (this.wasNew) {
 				this.cache.reset();
+			} else {
+				this.cache.update(this.model);
 			}
 			router.nav(this.routeAfter(), {trigger:true});
 		},
@@ -149,13 +162,97 @@ var myPlacesApp=(function() {
 		id : 'place_editor',
 		cache:listCache.place,
 		
+		events: _.extend(
+			{'click .get_location_btn': 'getLocation',
+			'click .get_address_btn': 'getAddress'
+			}, EditView.prototype.events),
+		
+		render: function() {
+			EditView.prototype.render.apply(this,arguments);
+			var bar=formsAPI.compileTemplate('#geocode_bar');
+			$('label[for="id_address"]', this.$el).parent().before($(bar()));
+		},
+		
+		saveModel: function() {
+			var deferredSaves=[],
+			addressWidget=formsAPI.getWidget('address', this.$el);
+			if (addressWidget.deferredSave) {
+				deferredSaves.push(addressWidget.deferredSave);
+			}
+			
+			EditView.prototype.saveModel.call(this, null, {deferredSaves:deferredSaves});
+		},
+		
 		routeAfter: function() { 
 			var group=this.model.get('group');
 			if (group) return '/group/'+group;
 			return '/';
 			},
 		
+		
+		getLocation: function() {
+			var addressWidget=formsAPI.getWidget('address', this.$el),
+			address=addressWidget.data,
+			root=this.$el;
+			if (!address || !address.toString() ) {
+				alert(gettext('Address is empty, first define address to use geocoding'));
+			} else {
+				postJson('/mp/api/geocode', {address:address.attributes}, this)
+				.done(function(data){
+					if (! data.position) {
+					alert(gettext('No location found for given address'));
+					} else {
+						var locationWidget=formsAPI.getWidget('position', root);
+						locationWidget.set(data.position);
+						
+					}
+				});
+				
+			}
+		},
+		
+		getAddress: function() {
+			var loc= formsAPI.getWidget('position', this.$el).get(),
+			root=this.$el;
+			if (!loc) alert(gettext('Location is empty, first define location to use geocoding'));
+			postJson('/mp/api/geocode/reverse', {position:loc}, this)
+			.done(function(data){
+				if (! data.address) {
+				alert(gettext('No address found for given location'));
+				} else {
+					var addressWidget=formsAPI.getWidget('address', root);
+					addressWidget.openEditor(null, data.address);
+				}
+			});
+			
+		},
+		
+	});
+	
+	var postJson=function(url, data, syncOn) {
+		if (syncOn) {
+		if (syncOn._running) {
+			alert(gettext('Another request is in progress, wait until it finishes'));
+			return {done:function(){}};
+		}
+		syncOn._running=true;
+		}
+		var res= $.ajax({url:url,
+			type:'POST',
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			data: JSON.stringify(data),
 		});
+		res.always(function() {
+			if (syncOn && syncOn._running) {
+				syncOn._running=false;
+			}
+		})
+		.fail(function(xhr, status, error){
+				alert(gettext('Server Error: ')+status+' - '+error); 
+			});
+		return res;
+	};
 	
 	var ListView=formsAPI.BaseListView.extend({
 		templateItem : '#tbd',
@@ -505,6 +602,13 @@ var myPlacesApp=(function() {
 		fullSite=false;
 	}
 	$('#menu_btn').click(toggleMenu);
+	$( document ).ajaxStart(function() {
+		$('#ajax_indicator').show();
+	});
+	
+	$( document ).ajaxStop(function() {
+		$('#ajax_indicator').hide();
+	});
 	Backbone.history.start();
 	};
 	
@@ -548,8 +652,8 @@ var customWidgets= (function () {
 			var updateLocation=function(loc) {
 				widget.set([round(loc.lat), round(loc.lng)]);
 			};
-			var addressWidget=this.getPeerWidget('address'),
-			pointInfo= gettext('Current Address: ')+this.options.view.model.get('address_string');
+			var addressWidget=formsAPI.getWidget('address', this.options.view.$el),
+			pointInfo= addressWidget.data?addressWidget.data.toString():'';
 			
 			showMapAsSelector(this.getValue(), updateLocation, pointInfo);
 			
@@ -582,4 +686,7 @@ var customWidgets= (function () {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Start Application
 
-$(function() {myPlacesApp.init(siteFlavour);});
+$(function() {
+	myPlacesApp.init(siteFlavour);
+	
+});

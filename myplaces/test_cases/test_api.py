@@ -184,9 +184,18 @@ class TestApi(test.LiveServerTestCase):
         
     def test_create(self):
         c=ApiClient('user', 'user')
+        c2=ApiClient('admin', 'admin')
         res=c.post(ApiClient.GROUP, {'name':'test', 'description':'testovaci unit', 'private':False})
         
-        group_id=res['id']
+        try:
+            c2.post(ApiClient.GROUP, {'name':'test', 'description':'testovaci unit', 'private':False})
+            self.fail('Should not be able to create with same name')
+        except ApiError, e:
+            self.assertEqual(e.status, 400)
+        
+        group_id=res['id']\
+        
+        c.patch(ApiClient.GROUP, {'description':'testovaci test'}, pk=group_id)
         
         res=c.post(ApiClient.ADDRESS, {'street':'Čapajevovo nám. 13', "city":"Růžová", "country":"Česká republika",
                                        'postal_code':'809 22'})
@@ -212,6 +221,16 @@ class TestApi(test.LiveServerTestCase):
         except ApiError, e:
             pass
         
+        try:
+            c.post(ApiClient.PLACE, {"name":"Zajímave místo", "url":"http://nekde.onde.cz", "address":adr_id,
+                                     "group":group_id, 'position':[14.5, 51]})
+            self.fail('Should not allow to insert same name')
+        except ApiError, e:
+            self.assertEqual(e.status, 400)
+        
+        #update with same values:
+        res=c.put(ApiClient.PLACE, res, pk=res['id'])
+        
         res=c.put(ApiClient.PLACE,  {"name":"Nejzajímavější místo", "url":"http://nekde.jinde.cz", 
                                "address":adr_id, "group":group_id, 'position':[14.5, 50.2]},
                                pk=res['id'])    
@@ -231,10 +250,11 @@ class TestApi(test.LiveServerTestCase):
         res=c.patch(ApiClient.PLACE,  {"name":"Nejnezajímavější místo"},  pk=res['id'])
         self.assertEqual(res['name'], u"Nejnezajímavější místo")
         
+        res=c.patch(ApiClient.PLACE,  {"url":"http://aaa.com"},  pk=res['id'])
+        self.assertEqual(res['url'], u"http://aaa.com")
+        
         place_id=res['id']
         # can modify only my entities
-        c2=ApiClient('admin', 'admin')
-        
         try:
             c2.patch(ApiClient.PLACE,  {"name":"Nejnejzajímavější místo"}, pk=place_id)
             self.fail('Should be protected')

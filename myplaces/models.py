@@ -139,4 +139,5 @@ class Place(Auditable):
     class Meta:
         verbose_name=_('Place')
         verbose_name_plural=_('Places')
+        permissions=(('geocode_place', 'Can use geocoding API'),)
     

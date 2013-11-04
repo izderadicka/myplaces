@@ -402,11 +402,12 @@ var createMap = function(elementId, options) {
 			marker=L.marker(pos, {draggable:true}).addTo(map);
 			L.DomEvent.addListener(marker, 'click', function(event){
 				var pos=marker.getLatLng();
-				map.openPopup(gettext('Lat: ')+pos.lat+", "+gettext("Lng: ")+pos.lng +
-				'<p>'+pointInfo+'</p>', pos);
+				map.openPopup('<div class="position"><span class="lat">'+pos.lat+
+					'</span>,<span class="lng">'+pos.lng +'</span></div>'+
+					'<div class="address">'+pointInfo+'</div>', pos);
 				L.DomEvent.stopPropagation(event);
 			});
-		}
+		};
 		if (! skipMarker) { 
 			createMarker(location);
 		}

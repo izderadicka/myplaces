@@ -6,7 +6,10 @@ Created on Aug 19, 2013
 import re
 from models import Place, PlacesGroup, Address
 from rest_framework import serializers, viewsets, permissions, exceptions,\
-    fields
+    fields, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+    
 import django_filters
 from django.contrib.gis.measure import Distance
 from django.contrib.gis.geos import  Point
@@ -18,6 +21,7 @@ from django.forms import widgets
 from django.core.exceptions import ValidationError
 import widgets as custom_widgets
 from rest2backbone import widgets as r2b_widgets
+from django.db.models.query_utils import Q
 
 
 class FilterError(exceptions.APIException):
@@ -120,20 +124,30 @@ class PlacesFilter(django_filters.FilterSet):
         
 class PlacesSerializer(BaseSerializer):
     position=LocationField(label=_('Location'), widget=custom_widgets.LocationWidget)
-    address=rest_framework.relations.PrimaryKeyRelatedField(label=_('Address'), widget=r2b_widgets.DynamicEditor,
+    address=rest_framework.relations.PrimaryKeyRelatedField(label=_('Address'), 
+                widget=r2b_widgets.DynamicEditor(options={'deferredSave':True}),
                 required=False)
     address_string=rest_framework.relations.RelatedField(source='address')
     description=fields.CharField(widget=widgets.Textarea, label=_('Description'), max_length=200, required=False)
     group= rest_framework.relations.PrimaryKeyRelatedField(widget=widgets.HiddenInput)
     def validate_name(self, attrs, source):
+        if not attrs.has_key(source):
+            return attrs
         name=attrs[source]
-        existing=Place.objects.filter(name=name, group=attrs['group'])
-        if len(existing)>0:
-            raise rest_framework.serializers.ValidationError(_('Place with same name  already exists in this collection'))
+        group=attrs.get('group')
+        if not group and self.object:
+            group=self.object.group
+            
+        if group:
+            existing=Place.objects.filter(name=name, group=group)
+            if self.object and self.object.pk:
+                existing=existing.exclude(pk=self.object.pk)
+            if len(existing)>0:
+                raise rest_framework.serializers.ValidationError(_('Place with same name  already exists in this collection'))
         return attrs
     class Meta:
         model= Place
-        fields=['id', 'position', 'name',  'address', 'address_string', 'url', 'description', 'group', 'is_mine']
+        fields=['id',  'name', 'position', 'address', 'address_string', 'url', 'description', 'group', 'is_mine']
         
 class PlacesViewSet(UserMixin,ViewSetWithIndex):
     queryset=Place.objects.all()
@@ -187,8 +201,12 @@ class GroupsSerializer(BaseSerializer):
     count=CountField(source='places', label=_('Count of Places'))
     description=fields.CharField(widget=widgets.Textarea, label=_('Description'), max_length=200, required=False)
     def validate_name(self, attrs, source):
+        if not attrs.has_key(source):
+            return attrs
         name=attrs[source]
         existing=PlacesGroup.objects.filter(name=name, private=False).exclude(created_by=self.context['request'].user)
+        if self.object and self.object.pk:
+                existing=existing.exclude(pk=self.object.pk)
         if len(existing)>0:
             raise rest_framework.serializers.ValidationError(_('Collection with same name is already created by someone else'))
         return attrs
@@ -202,7 +220,10 @@ class GroupsViewSet(UserMixin,ViewSetWithIndex):
     filter_class=GroupsFilter
     def get_queryset(self):
         q=self.request.QUERY_PARAMS.get('q')
-        qs=self.queryset
+        query=Q(private=False)
+        if self.request.user.is_authenticated():
+            query|=Q(private=True, created_by=self.request.user)
+        qs=self.queryset.filter(query)
         if q:
             qs=lookup(q,qs)
         return qs
@@ -214,6 +235,49 @@ def lookup(lookup, q):
     params=[['%'+t+'%']*2 for t in terms]
     params=list(itertools.chain(*params))
     return q.extra(where=expression, params=params)
+
+
+class LocationSerializer(serializers.Serializer):
+    position=LocationField()
+
+class GeocodePermission(permissions.BasePermission):    
+    def has_permission(self, request, view):
+        return request.user.has_perm('myplaces.geocode_place')
+
+import geocode
+class GeocodeReverse(APIView):
+    permission_classes=(GeocodePermission,)
+    def post(self, request, format=None):
+        s=LocationSerializer(data=request.DATA)
+        if not s.is_valid():
+            return Response({'error':'Invalid request data'}, status=status.HTTP_400_BAD_REQUEST)
+        data=s.object
+        try:
+            address, place=geocode.get_address_remote(data.get('position'))
+            s=AddressesSerializer(address)
+            address=s.data
+        except geocode.NotFound:
+            address=None
+        
+        return Response({'address':address})
+    
+    
+class Geocode(APIView):
+    permission_classes=(GeocodePermission,)
+    def post(self, request, format=None):
+        s=AddressesSerializer(data=request.DATA.get('address'))
+        if not s.is_valid():
+            return Response({'error':'Invalid request data'}, status=status.HTTP_400_BAD_REQUEST)
+        address=s.object
+        try:
+            new_address, place=geocode.get_coordinates_remote(address)
+            s=LocationSerializer({'position':place})
+            data=s.data
+        except geocode.NotFound:
+            data={'position':None}
+        
+        return Response(data)
+    
         
     
     
