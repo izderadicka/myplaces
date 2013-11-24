@@ -11,9 +11,6 @@ import remote
 
 import logging
 log=logging.getLogger('mp.sockets')
-#TODO: Move remote init to server start
-remote.init(True)
-
 
 @namespace('/log')
 class LogController(BaseNamespace):

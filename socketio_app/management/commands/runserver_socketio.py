@@ -12,7 +12,9 @@ from django.core.management.commands.runserver import naiveip_re, DEFAULT_PORT
 from django.utils.autoreload import code_changed, restart_with_reloader
 from socketio.server import SocketIOServer
 
+
 import gevent.monkey
+from optparse import make_option
 
 gevent.monkey.patch_all()
 
@@ -27,6 +29,10 @@ def reload_watcher():
         sleep(1)
 
 class Command(BaseCommand):
+    
+    option_list=BaseCommand.option_list + (
+        make_option('--use_static_handler', action='store_true', help="Serves static files - only for debugging!"),
+                                           )
 
     def handle(self, addrport="", *args, **options):
 
@@ -46,13 +52,15 @@ class Command(BaseCommand):
         #   io.Socket JS constructor
         # allowing the port to be set as the client-side default there.
         environ["DJANGO_SOCKETIO_PORT"] = str(self.port)
-
-        start_new_thread(reload_watcher, ())
+        if settings.DEBUG:
+            start_new_thread(reload_watcher, ())
         try:
             bind = (self.addr, int(self.port))
             print
             print "SocketIOServer running on %s:%s" % bind
             print
+            #inject this setting - needed to initialize zmq in 'green' mode
+            settings._wrapped.USE_GEVENT=True
             handler = self.get_handler(*args, **options)
             server = SocketIOServer(bind, handler, resource="socket.io", policy_server=True)
             server.serve_forever()
@@ -75,8 +83,7 @@ class Command(BaseCommand):
         except ImportError:
             return handler
         use_static_handler = options.get('use_static_handler', True)
-        insecure_serving = options.get('insecure_serving', False)
-        if (settings.DEBUG and use_static_handler or
-                (use_static_handler and insecure_serving)):
+       
+        if (settings.DEBUG or use_static_handler):
             handler = StaticFilesHandler(handler)
         return handler

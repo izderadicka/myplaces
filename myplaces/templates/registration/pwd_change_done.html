@@ -1,0 +1,17 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'Password Change Successful' %}
+{%endblock%}
+{%block header%}{% trans 'Password Change Successful' %}{%endblock%}
+{%block content%}
+<p class="message">
+{%blocktrans%}
+Password change was successful
+<br>
+You can return to {%endblocktrans%}
+<a href="{%url 'home'%}">{%trans 'home page'%}</a>
+.
+</p>
+{%endblock%}

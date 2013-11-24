@@ -102,20 +102,28 @@ class NominatimAddressAdapter(object):
                   (ur'ulice', '')]
     def fix_street(self, ext=None):
         street=ext or self.a.street
+        if not street:
+            return
         street=self._apply_fixes(street, self.STREET_FIXES)
         clean=self.ONE_LETTER.sub('',street).strip()
         if clean:
             street=clean
         return street
+    def fix_county(self):
+        return self.a.county
+    
+    def fix_state(self):
+        return self.a.state
     
     PC_FIX=re.compile(r'(^|\s)(\d{3} \d{2})(\s|$)')      
     def __unicode__(self):
-        if self.a.street or self.a.city:
-            adr=[]
-            for field in ('street', 'city', 'country'):
-                s=getattr(self, 'fix_'+field)() if hasattr(self,'fix_'+field) else None
-                if s:
-                    adr.append(s)
+       
+        adr=[]
+        for field in ('street', 'city', 'county', 'state', 'country'):
+            s=getattr(self, 'fix_'+field)() if hasattr(self,'fix_'+field) else None
+            if s:
+                adr.append(s)
+        if adr:
             return u', '.join(adr)
         else:
             string= self.a.unformatted
@@ -183,6 +191,7 @@ class OSMNominatim(CoderMixin, geocoders.OpenMapQuest):
         parsed_address.country=address.get('country')
         parsed_address.county=address.get('county')
         parsed_address.state=address.get('state')
+        parsed_address.postal_code=address.get('postcode')
         
         
         latitude = resource['lat'] or None

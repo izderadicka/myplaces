@@ -1,0 +1,18 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'Account Activated' %}
+{%endblock%}
+{%block header%}{% trans 'Account Activated' %}{%endblock%}
+{%block content%}
+<p class="message">
+{%blocktrans%}
+Your account is now activated.
+<br>
+You can now  {%endblocktrans%}
+<a href="{%url 'auth_login'%}">{%trans 'log into our site'%}</a>
+{%blocktrans%} with your credentials.
+{%endblocktrans%}
+</p>
+{%endblock%}

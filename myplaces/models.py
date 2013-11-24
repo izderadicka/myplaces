@@ -78,6 +78,7 @@ class PlacesGroup(Auditable):
         verbose_name_plural=_('Places Groups')
         permissions = (
             ("import_placesgroup", "Can import places data from CSV"),
+            ("higher_limit_placesgroup", "Can create more placesgroup objects")
         )
     
 class Address(Auditable):
@@ -93,16 +94,18 @@ class Address(Auditable):
     #-------------------------------------------------------------
     
     def __unicode__(self):
-        if self.street or self.city:
-            addr=[]
-            def append_if_exists(item):
-                if item:
-                    addr.append(uni(item))
-            append_if_exists(self.street)
-            append_if_exists( u'%s %s'% (uni(self.postal_code), uni(self.city)) if self.postal_code else self.city)
-            #append_if_exists(self.county)
-            #append_if_exists(self.state)
-            append_if_exists(self.country)
+        
+        addr=[]
+        def append_if_exists(item):
+            if item:
+                addr.append(uni(item))
+        append_if_exists(self.street)
+        append_if_exists( u'%s %s'% (uni(self.postal_code), uni(self.city)) if self.postal_code else self.city)
+        append_if_exists(self.county)
+        append_if_exists(self.state)
+        append_if_exists(self.country)
+            
+        if addr:
             return u', '.join(addr)
         else:
             return self.unformatted or ''
@@ -110,6 +113,9 @@ class Address(Auditable):
     class Meta:
         verbose_name=_('Address')
         verbose_name_plural=_('Addresses')
+        permissions= (
+                      ("higher_limit_address", "Can create more address objects"),
+                      )
     
 class Place(Auditable):
     name=models.CharField(_('Name'), max_length=80, null=False, blank=False)
@@ -118,8 +124,8 @@ class Place(Auditable):
                             verbose_name=_('Group'))
     position=models.PointField(_('Coordinates'), srid=4326, null=False, blank=False)
     #TODO: Change to OnetoOneFields - this will require chnange of test data
-    address=models.ForeignKey(Address, related_name="places", verbose_name=_('Address'),null=True, blank=True)
-    url=models.URLField(_('WWW Link'), max_length=400, null=True, blank=True )
+    address=models.OneToOneField(Address, related_name="place", verbose_name=_('Address'),null=True, blank=True)
+    url=models.URLField(_('WWW Link'), max_length=200, null=True, blank=True )
     
     objects = models.GeoManager()
     
@@ -139,5 +145,7 @@ class Place(Auditable):
     class Meta:
         verbose_name=_('Place')
         verbose_name_plural=_('Places')
-        permissions=(('geocode_place', 'Can use geocoding API'),)
+        permissions=(('geocode_place', 'Can use geocoding API'),
+                     ("higher_limit_place", "Can create more place objects"),
+                     )
     

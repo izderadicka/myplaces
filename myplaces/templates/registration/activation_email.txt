@@ -1,0 +1,17 @@
+{% load i18n %} 
+{% load url from future %}
+{%blocktrans%}
+Welcome to {{site.name}},
+
+this email was used to register at {{site.name}}.
+You can now activate your account by opening this link:
+{%endblocktrans%}
+https://{{site.domain}}{%url 'registration_activate' activation_key%}
+{%blocktrans%}
+If you have not registered with us please ignore this email (account will not be created).
+
+
+Yours
+
+The {{site.name}} Team
+{%endblocktrans%}

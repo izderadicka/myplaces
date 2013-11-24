@@ -1,0 +1,15 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'Registration Closed' %}
+{%endblock%}
+{%block header%}{% trans 'Registration Closed' %}{%endblock%}
+{%block content%}
+<p class="message">
+{%blocktrans%}
+Registration is closed temporarily.
+
+{%endblocktrans%}
+</p>
+{%endblock%}

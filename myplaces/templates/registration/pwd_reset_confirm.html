@@ -1,0 +1,38 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'Password Reset' %}
+{%endblock%}
+{%block head_script%}
+{{form.media}}
+{%endblock%}
+
+{%block header%}
+{% if validlink %}
+{% trans 'Reset Password' %}
+{%else%}
+{% trans 'Unsuccessful Password Reset'%}
+{%endif%}
+{%endblock%}
+{%block content%}
+{% if validlink %}
+
+<form method="POST" action="" id="pwd_reset_form">
+<div class="r2b_form">
+{%include 'form_content.html'%}
+<div class="r2b_field_row"><input type="submit" value="{%trans 'Reset Password'%}"/></div>
+</div>
+</form>
+
+{%else%}
+<p class="message">
+{%blocktrans%}
+The password reset link was invalid, possibly because it has already been used. 
+<br>
+Please request a new password reset 
+{%endblocktrans%}
+<a href="{%url 'auth_password_reset'%}">{%trans 'here'%}</a>.
+</p>
+{%endif%}
+{%endblock%}

@@ -225,7 +225,7 @@ def import_places(temp_file, mapping, name, description=None, private=False,
                         address=None
                         if mapping.get('address'):
                             address_data=dict([(name, l[mapping['address'][name]]) for name in mapping['address']])
-                            address, address_created=Address.objects.get_or_create(**address_data)
+                            address=Address(**address_data)
                         place.description=get_existing('description')
                         place.url=get_existing('url')
                         place.address=address

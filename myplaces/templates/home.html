@@ -1,6 +1,7 @@
 {%extends 'base.html'%}
 {% load url from future %}
 {% load i18n %} 
+{% load utility_tags %}
 {%block title%}
 MyPlaces
 {%endblock%}
@@ -31,13 +32,13 @@ MyPlaces
 <div id="login">
 {%if user.is_authenticated  %}
 
-<form action="/logout/" method="get">
+<form action="{%url 'auth_logout'%}" method="get">
 <span class="current_user">{{user}}</span>
 <input type="hidden" name="next" value="{%url 'home'%}">
 <input type="submit" value="{%trans 'Log Out'%}" id="logout-btn">
 </form>
 {%else%}
-<form id="login_form" action="/login/" method="post">
+<form id="login_form" action="{%full_url 'auth_login' 1%}" method="post">
  {% csrf_token %}
 <label for="id_username">{%trans 'Login:'%}</label><input type="text" name="username" id="id_username">
 <label for="id_password">{%trans 'Password:'%}</label><input type="password" name="password" id="id_password">
@@ -97,7 +98,9 @@ MyPlaces
 <div class="search_bar">
 <input type="search" id="place_search_<%=id%>" class="search">
 <div id="place_search_btn" class="search_btn"></div>
-<div class="new_btn"></div>
+{% if perms.myplaces.add_place %}
+<% if (is_mine) {%><div class="new_btn"></div><% } %>
+{%endif%}
 </div>
 <div id="places_list" class="list_container"></div>
 </div>
@@ -108,7 +111,9 @@ MyPlaces
 <div class="search_bar">
 <input type="search" id="group_search" class="search">
 <div id="group_search_btn" class="search_btn"></div>
+{% if perms.myplaces.add_placesgroup %}
 <div class="new_btn"></div>
+{%endif%}
 </div>
 <div id="group_list" class="list_container"></div>
 </div>
@@ -214,7 +219,8 @@ MyPlaces
 <script type="text/template" id="main_menu" >
 <ul id="main_menu_list">
 {% if not user.is_authenticated %}
-<li><a href="/login?next=%2Fmp">{%trans 'Login'%}</a></li>
+<li><a href="{%url 'auth_login'%}?next=%2Fmp">{%trans 'Login'%}</a></li>
+<li><a href="{%url 'registration_register'%}">{%trans 'Register'%}</a></li>
 {%endif%}
 <li><a href="{%url 'home' %}">{%trans 'Reload'%}</a></li>
 {%if perms.myplaces.import_placesgroup and flavour == 'full'%}
@@ -226,7 +232,9 @@ MyPlaces
 <li><a href="{%url 'home' %}?flavour=full">{%trans 'Full Site'%}</a></li>
 {%endif%}
 {% if user.is_authenticated %}
-<li><a href="/logout?next=%2Fmp">{%trans 'Logout'%}</a></li>
+<li><a href="{%url 'profile_change' %}">{%trans 'My Profile'%}</a></li>
+<li><a href="{% url 'auth_password_change'%}">{%trans 'Change Password'%}</a></li>
+<li><a href="{%url 'auth_logout'%}?next=%2Fmp">{%trans 'Logout'%}</a></li>
 {%endif%}
 </ul>
 </script>

@@ -81,8 +81,9 @@ body {
 	 font-size: 0.9em;
 }
 
-.login_form_separate {
+.registration {
 	margin:10px;
+	max-width:480px;
 }
 
 #top_bar #menu_btn {
@@ -380,8 +381,7 @@ form .small_btn {
 	height:4em;
 
 	}
-
-
+	
 .map_btn {
     background: url("/static/mp/img/map.svg") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
     background-size: 33px auto;

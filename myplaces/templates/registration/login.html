@@ -1,12 +1,12 @@
-{%extends 'base.html'%}
+{%extends 'registration/base.html'%}
 {% load i18n %} 
 {% load url from future %}
 {%block title%}
 {% trans 'User Login' %}
 {%endblock%}
-{%block body%}
+{%block header%}{% trans 'User Login' %}{%endblock%}
+{%block content%}
 <div class="login_form_separate">
-<h1>{% trans 'User Login' %}</h1>
 {% if form.errors %}
 <p>{%trans "Your username and password didn't match. Please try again."%}</p>
 {% endif %}
@@ -29,5 +29,8 @@
 <input type="submit" value="{%trans 'Login'%}" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
+{%if form.errors %}
+<p><a href="{%url 'auth_password_reset'%}">{%trans 'Have you forgotten you password?'%}</a></p>
+{%endif%}
 </div>
 {% endblock %}

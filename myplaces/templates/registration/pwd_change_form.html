@@ -1,0 +1,20 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'Change Password' %}
+{%endblock%}
+{%block head_script%}
+{{form.media}}
+{%endblock%}
+{%block header%}{% trans 'Change Password' %}{%endblock%}
+{%block content%}
+<form method="POST" action="{%url 'auth_password_change' %}" id="pwd_change_form">
+<div class="r2b_form">
+{%include 'form_content.html'%}
+<div class="r2b_field_row"><input type="submit" value="{%trans 'Change Password'%}"/>
+{%include 'cancel_btn.html'%}
+</div>
+</div>
+</form>
+{%endblock%}

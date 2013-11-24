@@ -11,23 +11,9 @@ CSV file must contains place name and coordinates or postal address.
 {%endblocktrans%}
 </p>
 <form method="POST" action="{%url 'upload-places' step%}" enctype="multipart/form-data" id="import_start_form">
-{% csrf_token %}
+
 <div id="id_form_import1" class="r2b_form">
-{%if form.errors%}
-<ul class="r2b_errors">
-{%for name in form.errors%}
-<li>{{name}} - {{form.errors|getitem:name|join:'; '}}</li>
-{%endfor%}
-</ul>
-{%endif%}
-{% for f in form %}
-{% if not f.label %}{{f}}{%else%}
-<div class="r2b_field_row">
-<label for="id_{{f.name}}" class="r2b_field_label {{f.css_classes}}">{{f.label}}</label>
-<div class="r2b_field">{{f}}</div>
-</div>
-{%endif%}
-{%endfor%}
+{%include 'form_content.html'%}
 <div class="r2b_field_row"><input type="submit" value="{%trans 'Next'%}"/></div>
 </div>
 </form>

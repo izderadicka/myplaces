@@ -1,0 +1,20 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'User Profile' %}
+{%endblock%}
+{%block head_script%}
+{{form.media}}
+{%endblock%}
+{%block header%}{%blocktrans%}User Profile of {{object}}{%endblocktrans%}{%endblock%}
+{%block content%}
+<form method="POST" action="{%url 'profile_change' %}" id="profile_form">
+<div class="r2b_form">
+{%include 'form_content.html'%}
+<div class="r2b_field_row"><input type="submit" value="{%trans 'Save'%}"/>
+{%include 'cancel_btn.html'%}
+</div>
+</div>
+</form>
+{%endblock%}

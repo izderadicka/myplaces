@@ -45,6 +45,44 @@ class UserMixin():
             obj.update_user(self.request.user)
             
     permission_classes=(CreatedOrReadOnly,permissions.DjangoModelPermissionsOrAnonReadOnly)
+    
+class LimitCreateMixin(object):
+    """
+    Limits number of created objects per user
+    """
+    max_objects=None
+    max_objects_higher=None
+    
+    def get_count(self,object, request):
+        return self.get_queryset().filter(created_by=request.user).count()
+        
+    def get_limit(self, object, request):
+        if request.user.has_perm('myplaces.higher_limit_'+ object.__class__._meta.module_name):
+            return self.max_objects_higher
+        return self.max_objects
+        
+    def is_within_limit(self, object, request):
+        limit=self.get_limit(object, request)
+        if not limit:
+            return True
+        if self.get_count(object,request)>=limit:
+            return False
+        return True
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+
+        if serializer.is_valid():
+            if not self.is_within_limit(serializer.object, request):
+                return Response({'':[_('Reached maximum number of records per user')]}, status=status.HTTP_400_BAD_REQUEST)
+            self.pre_save(serializer.object)
+            self.object = serializer.save(force_insert=True)
+            self.post_save(self.object, created=True)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED,
+                            headers=headers)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class HLSerializer(serializers.HyperlinkedModelSerializer):
     url_field_name='instance_url'
@@ -111,7 +149,9 @@ class AddressesSerializer(BaseSerializer):
         #read_only_fields = ('unformatted',)
         
         
-class AddressesViewSet(UserMixin, ViewSetWithIndex):
+class AddressesViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
+    max_objects=29*199
+    max_objects_higher=99*499
     queryset=Address.objects.all()
     serializer_class=AddressesSerializer
     
@@ -149,10 +189,16 @@ class PlacesSerializer(BaseSerializer):
         model= Place
         fields=['id',  'name', 'position', 'address', 'address_string', 'url', 'description', 'group', 'is_mine']
         
-class PlacesViewSet(UserMixin,ViewSetWithIndex):
+class PlacesViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
+    max_objects=199
+    max_objects_higher=499
     queryset=Place.objects.all()
     serializer_class=PlacesSerializer
     filter_class=PlacesFilter
+    
+    def get_count(self,object, request):
+        return self.get_queryset().filter(created_by=request.user, group=object.group).count()
+    
     _allowed_units=('m','km','mi', 'ft')
     _dist_re=re.compile('^(\d+\.?\d*)(\w{1,3})?$', re.IGNORECASE)
     _dist_q_re=re.compile(r'^within\s+(\d+\.?\d*\w{1,3})?\s+from\s+(\d+\.?\d*,\s*\d+\.?\d*)$')
@@ -214,7 +260,9 @@ class GroupsSerializer(BaseSerializer):
         model=PlacesGroup
         fields=['id', 'name', 'description', 'private', 'is_mine', 'count']
         
-class GroupsViewSet(UserMixin,ViewSetWithIndex):
+class GroupsViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
+    max_objects=29
+    max_object_higher=99
     queryset=PlacesGroup.objects.all()
     serializer_class=GroupsSerializer
     filter_class=GroupsFilter

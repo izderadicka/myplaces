@@ -1,0 +1,19 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'Registration Complete' %}
+{%endblock%}
+{%block header%}{% trans 'Registration Complete' %}{%endblock%}
+{%block content%}
+<p class="message">
+{%blocktrans%}
+Your registration is now send. 
+You will receive an email in a minute, with instructions how to complete your registration.
+<br>
+In a meanwhile you can still {%endblocktrans%}
+<a href="{%url 'home'%}">{%trans 'use our site'%}</a>
+{%blocktrans%} as unregistered user.
+{%endblocktrans%}
+</p>
+{%endblock%}

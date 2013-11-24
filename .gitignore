@@ -41,3 +41,5 @@ _$*
 /web
 /.coverage
 /test_workers
+/registration
+/captcha

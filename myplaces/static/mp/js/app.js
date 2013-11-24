@@ -14,26 +14,63 @@ var myPlacesApp=(function() {
 //utility functions
 	
 	var ListCache=function(modelClass) {
-		var cache={},
+		var cache=this,
 		list,
 		options,
 		callback=null,
 		loadList=function(opt) {
 			options=opt;
 			list=new modelClass(options);
-			list.once('sync', function(){
+			list.fetch()
+			.done(function(){
 				if (callback) {
 					callback(list);
 				}
+			})
+			.fail(function(){
+				cache.reset();
 			});
-			list.fetch();
 			
 		};
 		
 		
+		$(document).on('data-update', function(event, model, action){
+			var cacheType=modelClass.prototype.model.prototype.modelName,
+			modelType=model.modelName;
+			if (cacheType===modelType) {
+				if (action==='add' ||action =='delete') {
+					cache.reset();
+				} 
+				if (action=="change") {
+					if (list && list.get(model)) {
+						var oldModel=list.get(model);
+						if (model !== oldModel) {
+							var index=list.indexOf(oldModel);
+							list.remove(oldModel);
+							list.add(model, {at:index});
+						}
+					}
+				}
+				
+					cache.handleMine(model, action);
+
+			} else {
+				
+					cache.handleOther(model, action);
+			}
+			
+		});
+		
+		var pendingUpdate=null;
+		cache.updateIfCached= function(model) {
+			if (list && list.get(model)) {
+				pendingUpdate=list.get(model).fetch();
+			}
+			
+		};
 		cache.get=function(opt,fn) {
 			if (list && _.isEqual(opt,options)) {
-				fn(list);
+				$.when(pendingUpdate).always(function() {fn(list);});
 			} else {
 				callback=fn;
 				loadList(opt);
@@ -49,22 +86,35 @@ var myPlacesApp=(function() {
 			options=null;
 		};
 		
-		cache.update=function(model) {
-			if (list && list.get(model)) {
-				var oldModel=list.get(model);
-				if (model !== oldModel) {
-					var index=list.indexOf(oldModel);
-					list.remove(oldModel);
-					list.add(model, {at:index});
-				}
-			}
-		};
-		
 		return cache;
 	};
 	
-	var listCache={group:ListCache(restAPI.PlacesGroupList),
-			place:ListCache(restAPI.PlaceList)};
+	ListCache.extend=formsAPI.Widget.extend;
+	_.extend(ListCache.prototype, {
+		handleMine:function(model,action) {},
+		handleOther:function(model,action) {}
+	});
+	
+	PlaceListCache=ListCache.extend({
+		handleMine: function(model,action) {
+			if (action==='change' && model.onlyRelatedChanged) {
+				this.updateIfCached(model);
+			}
+		}
+		
+	});
+	
+	GroupListCache=ListCache.extend({
+		handleOther:function(model,action) {
+			if (model.modelName==="Place" && (action==="add" || action==="delete")) {
+				this.updateIfCached(model.get('group'));
+			}
+		}
+	});
+	
+	
+	var listCache={group: new GroupListCache(restAPI.PlacesGroupList),
+			place: new PlaceListCache(restAPI.PlaceList)};
 	
 	var getOrLoad = function(name, model, id) {
 		var g,
@@ -113,9 +163,9 @@ var myPlacesApp=(function() {
 		deleteModel: function() {
 			var view=this;
 			this.model.destroy();
-			this.cache.reset();
 			this.closeDialog();
 			this.model.once('sync', function(){
+				$(document).trigger('data-update', [view.model, 'delete']);
 				router.nav(view.routeAfter(), {trigger:true});
 			});
 			
@@ -135,9 +185,9 @@ var myPlacesApp=(function() {
 		},
 		afterSave: function() {
 			if (this.wasNew) {
-				this.cache.reset();
+				$(document).trigger('data-update', [this.model, 'add']);
 			} else {
-				this.cache.update(this.model);
+				$(document).trigger('data-update', [this.model, 'change']);
 			}
 			router.nav(this.routeAfter(), {trigger:true});
 		},
@@ -152,7 +202,7 @@ var myPlacesApp=(function() {
 		template : '#r2b_template_placesgroup',
 		tagName : 'div',
 		id : 'group_editor',
-		cache:listCache.group
+		
 		
 		});
 	
@@ -160,7 +210,7 @@ var myPlacesApp=(function() {
 		template : '#r2b_template_place',
 		tagName : 'div',
 		id : 'place_editor',
-		cache:listCache.place,
+		
 		
 		events: _.extend(
 			{'click .get_location_btn': 'getLocation',
@@ -664,14 +714,16 @@ var customWidgets= (function () {
 	//TODO: path toString of Address
 	restAPI.Address.prototype.toString=function () {
 		var self=this.attributes;
-		if (self.street || self.city) {
-            var addr=[],
-            append_if_exists = function(item){
+        var addr=[],
+        append_if_exists = function(item){
                 if (item) addr.push(item);
-            };
-            append_if_exists(self.street);
-            append_if_exists( self.postal_code?self.postal_code+' '+self.city: self.city);
-            append_if_exists(self.country);
+        };
+        append_if_exists(self.street);
+        append_if_exists( self.postal_code?self.postal_code+' '+self.city: self.city);
+        append_if_exists(self.county);
+        append_if_exists(self.state);
+        append_if_exists(self.country);
+        if (addr.length>0) {
             return addr.join(', ');
 		}
         else {

@@ -9,12 +9,12 @@ from django import test
 import unittest
 
 class TestViews(test.TestCase):
-    fixtures=["test_data.json", "test_data_auth.json"]
+    fixtures=[ "test_data_auth.json", "test_data.json",]
     
     def test_login(self):
         res=self.client.get('/mp/')
         self.assertTrue(res.status_code, 200)
-        res=self.client.post('/login/', {'username':'admin', 'password':'admin'})
+        res=self.client.post('/accounts/login/', {'username':'admin', 'password':'admin'})
         res=self.client.get('/mp/')
 
         self.assertTrue(res.status_code, 200)

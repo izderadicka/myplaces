@@ -1,0 +1,18 @@
+.captcha img {
+    vertical-align: bottom;
+}
+.captcha input[type="text"] {
+    width: 100px !important;
+}
+
+.reload_captcha {
+	background: url('/static/mp/img/reload.svg') no-repeat scroll 3px 5px rgba(0, 0, 0, 0);
+	background-size: 26px;
+	margin-left: 2px;
+}
+
+
+.small_btn.audio_captcha {
+    background: url("/static/mp/img/speaker.svg") no-repeat scroll 2px 4px rgba(0, 0, 0, 0);
+    background-size: 30px 30px;
+}

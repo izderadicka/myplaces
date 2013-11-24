@@ -105,6 +105,14 @@ class TestGeocode(unittest.TestCase):
         self.assertTrue(pos is not None)
         print pos, coords
         
+        pos, coords= geocode.get_coordinates(Address(city=u"Svojšice", country=u"Česko"))
+        self.assertTrue(pos is not None)
+        
+        pos, coords= geocode.get_coordinates(Address(street=u"Líšno", country=u"Česko"))
+        self.assertTrue(pos is not None)
+        
+        pos, coords= geocode.get_coordinates(Address(country=u"Česko"))
+        self.assertTrue(pos is not None)
         
      
     samples=[(CSV_FILE, lambda l: Address(unformatted=l[1])),
@@ -177,7 +185,10 @@ class TestGeocode(unittest.TestCase):
         
         self.assertEqual(p,p3)
         self.assertTrue(adr3.street,adr.street)
-
+        
+        
+        adr, p=c.reverse('50.0027028,15.0414849')
+        self.assertEqual(adr.postal_code, '28104')
 
 NO=-1                  
 if __name__=='__main__':

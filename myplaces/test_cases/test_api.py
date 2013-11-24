@@ -11,6 +11,7 @@ import httplib, urllib, urlparse
 import json
 from copy import copy
 from django import test
+import myplaces.resources as resources
 
 
 class ApiError(Exception):
@@ -106,7 +107,7 @@ class ApiClient():
 
 class TestApi(test.LiveServerTestCase):
 
-    fixtures=["test_data.json", "test_data_auth.json"]
+    fixtures=[ "test_data_auth.json", "test_data.json",]
     def test_access(self):
         c=ApiClient()
         groups=c.get(ApiClient.GROUP)
@@ -180,7 +181,24 @@ class TestApi(test.LiveServerTestCase):
         self.assertEqual(first, last)    
                 
             
-        
+    def test_limit(self):
+        c=ApiClient('user', 'user')
+        c2=ApiClient('admin', 'admin')
+        old_limit= resources.GroupsViewSet
+        resources.GroupsViewSet.max_objects=2
+        for i in range(2):
+            res=c.post(ApiClient.GROUP, {'name':'test %d'%i, 'description':'testovaci unit', 'private':False})
+            
+        try:
+            res=c.post(ApiClient.GROUP, {'name':'test to fail', 'description':'testovaci unit', 'private':False})
+            self.fail('Should reach limit')
+        except ApiError,e:
+            self.assertEqual(e.status, 400)
+            print e.body
+            
+        #but other user can create
+        res=c2.post(ApiClient.GROUP, {'name':'test to succed', 'description':'testovaci unit', 'private':False}) 
+        resources.GroupsViewSet.max_objects=old_limit   
         
     def test_create(self):
         c=ApiClient('user', 'user')

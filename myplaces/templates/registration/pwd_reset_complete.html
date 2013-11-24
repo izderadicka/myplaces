@@ -1,0 +1,18 @@
+{%extends 'registration/base.html'%}
+{% load i18n %} 
+{% load url from future %}
+{%block title%}
+{% trans 'Password Reset Finished' %}
+{%endblock%}
+{%block header%}{% trans 'Password Reset Finished' %}{%endblock%}
+{%block content%}
+<p class="message">
+{%blocktrans%}
+Password was was successful and your new password is ready.
+<br>
+You can now  {%endblocktrans%}
+<a href="{%url 'auth_login'%}">{%trans 'log into our site'%}</a>
+{%blocktrans%} with your new password.
+{%endblocktrans%}
+</p>
+{%endblock%}

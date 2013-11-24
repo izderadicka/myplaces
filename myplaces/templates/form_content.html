@@ -1,0 +1,17 @@
+{% load utility_tags %}
+{% csrf_token %}
+{%if form.errors%}
+<ul class="r2b_errors">
+{%for name in form.errors%}
+<li>{{name}} - {{form.errors|getitem:name|join:'; '}}</li>
+{%endfor%}
+</ul>
+{%endif%}
+{% for f in form %}
+{% if not f.label %}{{f}}{%else%}
+<div class="r2b_field_row">
+<label for="id_{{f.name}}" class="r2b_field_label {{f.css_classes}}">{{f.label}}</label>
+<div class="r2b_field">{{f}}</div>
+</div>
+{%endif%}
+{%endfor%}

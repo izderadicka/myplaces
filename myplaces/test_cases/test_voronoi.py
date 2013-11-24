@@ -44,7 +44,7 @@ class TestVoronoi(unittest.TestCase):
 
 import myplaces.views  as views          
 class TestVoronoiGeojson(test.TestCase):
-    fixtures=["test_data.json", "test_data_auth.json"]
+    fixtures=["test_data_auth.json", "test_data.json", ]
     
     def test_json_view(self):
         req= test.RequestFactory().get('/mp/gejson/group/voronoi/1')

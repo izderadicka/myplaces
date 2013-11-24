@@ -12,6 +12,9 @@ Install:
  sudo pip -r requirements.pip
  #numpy and matplotlib would be quicker from distro packages
  sudo apt-get install python-numpy python-matplotlib
+ #postgres database 9.1+ recommended, python driver, postgis
+ sudo apt-get install postgressql python-psycopg2 postgis
+
 
  #assure you have libzmq >= 3.2.3, may install it from source (ubuntu 13.04 has 2.2) - http://zeromq.org/intro:get-the-software
 ```
