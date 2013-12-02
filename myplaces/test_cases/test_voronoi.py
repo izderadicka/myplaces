@@ -8,6 +8,9 @@ from myplaces.voronoi import move_point, check_outside, voronoi2
 import numpy as np
 from django import test
 import json
+import subprocess
+import os
+from myplaces import remote
 
 class TestVoronoi(unittest.TestCase):
 
@@ -45,6 +48,14 @@ class TestVoronoi(unittest.TestCase):
 import myplaces.views  as views          
 class TestVoronoiGeojson(test.TestCase):
     fixtures=["test_data_auth.json", "test_data.json", ]
+    
+    def setUp(self):
+        remote.init()
+        manage=os.path.join(os.path.split(__file__)[0], '../../manage.py')
+        self.p=subprocess.Popen(['python', manage,  'process_server'], shell=False)
+      
+    def tearDown(self):
+        self.p.kill()
     
     def test_json_view(self):
         req= test.RequestFactory().get('/mp/gejson/group/voronoi/1')

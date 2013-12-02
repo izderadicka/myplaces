@@ -6,12 +6,14 @@ import myplaces.urls
 import myplaces.remote as remote
 from django.conf import settings
 from django.views.generic import RedirectView
-
+from account import AuthenticationLockForm
 import socketio.sdjango
 
 
-
+#patch site login form
+admin.site.login_form=AuthenticationLockForm
 admin.autodiscover()
+
 
 #Init zmq for remote calls 
 remote.init(hasattr(settings,'USE_GEVENT') and settings.USE_GEVENT)

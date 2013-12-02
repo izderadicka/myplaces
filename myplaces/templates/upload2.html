@@ -7,6 +7,8 @@
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog'  packages='myplaces'%}"></script>
 <script type="text/javascript">
 <!--
+
+var baseUrl='https://'+window.location.host
 var log=null,
 firstAttempt=null;
 function submitForm() {
@@ -46,7 +48,7 @@ function submitForm() {
 	};
 	
 	var createLog=function() {
-		log=io.connect('/log', {reconnect:false});
+		log=io.connect(baseUrl+'/log', {reconnect:false});
 		log.on('connect', function() {
 			log.emit('start', streamId)
 			postForm();

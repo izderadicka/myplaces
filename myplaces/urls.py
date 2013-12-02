@@ -36,7 +36,7 @@ urlpatterns = patterns('',
     
     url(r'^js-restAPI/?$', restApi.as_view(), {'router': router, 'url_prefix':'/mp/api'}, name='js-api'),   
     url(r'^/?$', TemplateView.as_view(template_name='home.html'), {'forms': FormFactory(router)}, name='home'),
-   
+    url(r'^info/about/?$', TemplateView.as_view(template_name='info/about.html')),
                        
     
     

@@ -3,9 +3,8 @@ from django.shortcuts import render_to_response, redirect
 import forms
 from django.template.context import RequestContext
 from django.utils.translation import ugettext as _
-from django.views.generic import  ListView
 from django.views.generic.edit import UpdateView
-from django.contrib.gis.geos import Point
+
 import logging
 from django.http import HttpResponse, HttpResponseBadRequest,\
     HttpResponseNotFound
@@ -13,9 +12,8 @@ import sys
 import os
 import json
 from myplaces.models import PlacesGroup, Place
-from myplaces.voronoi import voronoi2
+from myplaces.voronoi_util import voronoi_remote
 log=logging.getLogger('mp.views')
-from django.views.decorators.csrf import csrf_exempt
 import django_mobile
 import implaces
 import utils
@@ -96,44 +94,14 @@ def group_geojson(request, group_id):
     
     return HttpResponse(group.as_geojson(), mimetype='application/json')
 
-def group_voronoi_geojson(request, group_id):
-    try:
-        group=PlacesGroup.objects.get(id=group_id)
-    except PlacesGroup.DoesNotExist:
-        return HttpResponseNotFound('Non existent group id')
+
+
     
-    if group.places.all().count()>=3:
-        q=group.places.all().transform(srid=3857)
-        points= [(p.position.x, p.position.y) for p in  q]
-        
-        bbox=q.extent()
-        xsize=(bbox[2]-bbox[0])/3.0
-        ysize=(bbox[3]-bbox[1])/3.0
-        bbox=(bbox[0]-xsize, bbox[1]-ysize, bbox[2]+xsize, bbox[3]+ysize)
-        bbox2=(Point(bbox[0], bbox[1], srid=4326).transform(3857, True),
-              Point(bbox[2], bbox[3], srid=4326).transform(3857, True))
-        bbox2=(bbox2[0][0], bbox2[0][1], bbox2[1][0], bbox2[1][1])
-       
-        lines=voronoi2(points, bbox2)
-        lines=map(lambda p: (Point(*p[0], srid=3857).transform(4326, True), 
-                             Point(*p[1], srid=3857).transform(4326, True)), lines)
-        
-        result={"type":"FeatureCollection",
-                'features':[
-                { 'type':'Feature',
-                 'geometry':{'type':'MultiLineString', 'coordinates':[[list(l[0]), list(l[1])] for l in lines]}},
-                {'type':'Feature',
-                 'geometry':{'type': 'Polygon', 'coordinates': [[[bbox[0], bbox[1]], [bbox[2], bbox[1]], 
-                                                                [bbox[2], bbox[3]], [bbox[0], bbox[3]],
-                                                                [bbox[0], bbox[1]]]]}}
-                ],
-                'properties':{'bbox':list(bbox)}
-                }
-    else:
-        result={"type":"FeatureCollection",
-                "features":[]}
+
+def group_voronoi_geojson(request, group_id):
+    json_data=voronoi_remote(group_id)
             
-    return HttpResponse(json.dumps(result), mimetype='application/json')
+    return HttpResponse(json_data, mimetype='application/json')
 
 class ExtUpdateView(UpdateView):
     #We would like to display same form - with 

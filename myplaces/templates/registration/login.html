@@ -7,25 +7,8 @@
 {%block header%}{% trans 'User Login' %}{%endblock%}
 {%block content%}
 <div class="login_form_separate">
-{% if form.errors %}
-<p>{%trans "Your username and password didn't match. Please try again."%}</p>
-{% endif %}
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-{% csrf_token %}
-<div id="id_form_login" class="r2b_form">
-<div class="r2b_field_row">
-<label class="required r2b_field_label" for="id_username">{% trans 'User Name'%}</label>
-<div class="r2b_field">
- {{ form.username }}</div>
-</div>
-<div class="r2b_field_row">
-<label class="required r2b_field_label" for="id_password">{%trans 'Password'%}</label>
-<div class="r2b_field">
-{{ form.password }}
-</div>
-</div>
-</div>
-
+<form method="post" action="{% url 'auth_login' %}">
+{%include 'form_content.html'%}
 <input type="submit" value="{%trans 'Login'%}" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>

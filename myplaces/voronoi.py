@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import time
 from fortune import computeVoronoiDiagram, Site
 
-
 def circumcircle2(T):
     P1,P2,P3=T[:,0], T[:,1], T[:,2]
     delta_a = P2 - P1

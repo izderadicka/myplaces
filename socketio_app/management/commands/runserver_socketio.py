@@ -11,12 +11,13 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.commands.runserver import naiveip_re, DEFAULT_PORT
 from django.utils.autoreload import code_changed, restart_with_reloader
 from socketio.server import SocketIOServer
+from optparse import make_option
 
 
 import gevent.monkey
-from optparse import make_option
-
 gevent.monkey.patch_all()
+from psycogreen.gevent import patch_psycopg
+patch_psycopg()
 
 RELOAD = False
 

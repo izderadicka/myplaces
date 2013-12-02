@@ -16,6 +16,12 @@ log=logging.getLogger('mp.sockets')
 class LogController(BaseNamespace):
     def initialize(self):
         log.debug('Log Controller started')
+        if  not self.request.user.is_authenticated():
+            print '###ILLEGAL ACCESS'
+            self.error('ILLEGAL_ACCESS', 'You are not logged in')
+            self.disconnect()
+        else:
+            print '###OK ACCESS'
         
     def on_start(self, stream_id):
         log.debug('Started %s', stream_id)
@@ -24,7 +30,7 @@ class LogController(BaseNamespace):
         try:
             remote.sub_msg(socket, stream_id.encode('utf-8'))
             def on_msg(proc_id, mtype, msg):
-                print "##MSG", mtype,msg
+                #print "##MSG", mtype,msg
                 self.emit(mtype, msg)
                 if mtype=='done':
                     self.disconnect()

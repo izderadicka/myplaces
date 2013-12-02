@@ -1,0 +1,71 @@
+{% load url from future %}
+{% load i18n %} 
+<div id="about_page">
+<h3>{% trans 'About MyPlaces'%}</h3>
+
+{%blocktrans%}
+MyPlaces is a free project that enables to present collections of places on a map.  Many similar services exists, 
+but we focus on following values:
+<ul>
+<li><span class="small_title">Simplicity</span><br>
+Our user interface is minimalistic and simple. We offer just provided functionality - no fancy design.
+</li>
+<li><span class="small_title">Access</span><br>
+MyPlaces are using responsible pages design so they can be access from modern mobile phones and provide still 
+reasonable interface.
+<li>
+<li><span class="small_title">Open</span><br>
+MyPlaces are fully based on open source technologies. 
+Source for itself is <a href="https://github.com/izderadicka/myplaces">available on github.</a><br>
+Also used maps are from fantastic <a href="">OpenStreetMap</a> open project.
+</li>
+<li><span class="small_title">Passion</span><br>
+I like maps.   I like to browse them,   see their various features etc.   That's why I've learned a bit about GIS 
+and current map technologies on Internet.  This site is particularly my playground for these technologies and 
+particularly  place to see collections of places in an easy way. 
+</li>
+<li><span class="small_title">Extra</span><br>
+We would like to provide something extra,  which is not very common in similar services either in 
+areas of geographic data visualization or functionality.     As per now we can offerer interesting visualization - 
+<a href="http://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> of places in a collection, or 
+flexible import functionality, where collection can be imported from existing spreadsheet (CSV format).
+I hope we will be able to provide more in future.
+</li>
+</ul>
+{%endblocktrans%}
+
+<h3>{%trans 'Premium Features'%}</h3>
+{%blocktrans%}
+Few features of this service are set as premium and available only to users, who contributed to this project, 
+as a mean of appreciation for their support.<br> 
+You can  contribute to either development, content or also by a small donation - for details about how to 
+contribute go <a href="#contribute">here</a>.
+{%endblocktrans%}
+
+<h3>{% trans 'Technology'%}</h3>
+{%blocktrans%}
+Service is build in Python programing language,  using django (and geodjango support various geographic operations).  
+Python code is running in gevent webserver (with support for websockets and socket.io protocols) as a backend 
+service behind nginx webserver, which provides static data,  load balancing to backends and caching.<br>
+Backend uses Postgres database to store and manipulate data and PostGIS extension to this database. <br>
+Application is designed (mostly) as a single page application leveraging RESTful services on backend servers
+(with help of django-rest-framework) and backbone.js and jquery javasript libraries on client side to provide 
+dynamic interface.
+{%endblocktrans%}
+
+<h3>{%trans 'Credits And Attributions'%}</h3>
+{%blocktrans%}
+<p>
+Many thanks to all Open Source authors - I've used so many technologies here, so it is hard to list them all. 
+For details go the <a href="https://github.com/izderadicka/myplaces">source code on github</a>.  
+</p>
+
+<p>
+Special attribution to authors in The Noun Project - I used many of their nice icons/symbols in user interface.   
+(I did not collect names as required for proper CC attribution, sorry 
+if somebody feels offended let me know I'll fix)
+</p>
+{%endblocktrans%}
+</div>
+
+

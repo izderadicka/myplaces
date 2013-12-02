@@ -18,6 +18,7 @@ from geopy import geocoders, util
 from geopy.geocoders.base import GeocoderError
 from django.contrib.gis.geos import Point
 from models import Address
+from django.conf import settings
 
 
 class CoderMixin(object):
@@ -304,11 +305,10 @@ def geocode_remote(adr, alternate=False, reverse=False, timer=None):
     return place
 
 
-GC_ADDR='tcp://127.0.0.1:10009'  
 def get_coordinates_remote(adr, alternate=False, reverse=False, context=None):      
     ctx=context or remote.context()   
     socket=ctx.socket(zmq.REQ)  
-    socket.connect(GC_ADDR)
+    socket.connect(settings.REMOTE_ADDR_GEOCODE)
     
     pos=remote.call_remote(socket, 'geocode_remote', (adr, alternate, reverse),  timeout=60)
     

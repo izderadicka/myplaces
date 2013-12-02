@@ -528,6 +528,11 @@ form#import_start_form {
     font-weight: bold;
 }
 
+.small_title {
+	font-weight: bold;
+	font-size:110%;
+}
+
 @media only screen and (max-width: 480px) {
 .r2b_form input:not([type="button"]), .r2b_form textarea, .r2b_ro_value {
 	 

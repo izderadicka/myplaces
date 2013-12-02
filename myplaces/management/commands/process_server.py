@@ -5,6 +5,7 @@ Created on Jun 19, 2013
 '''
 
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 import myplaces.remote as remote
 import myplaces.implaces as implaces
 import os, threading
@@ -13,6 +14,7 @@ import logging
 from optparse import make_option
 import zmq
 import time
+from myplaces.voronoi_util import calc_voronoi #must import to register remote method
 
 
 
@@ -40,16 +42,23 @@ class Thread(threading.Thread):
         self.setDaemon(True)
         self.context=ctx 
         
-
-GC_ADDR='tcp://127.0.0.1:10009'         
 class GeocoderThread(Thread):
     def run(self):
         socket=self.context.socket(zmq.REP)
-        socket.bind(GC_ADDR)
+        socket.bind(settings.REMOTE_ADDR_GEOCODE)
         timer={'next_run':time.time()}
         while True:
             remote.do_remote_call(socket, False, allowed_methods=['geocode_remote'], 
                                   extra_kwargs={'timer':timer})
+            
+
+
+class CalcThread(Thread):
+    def run(self):
+        socket=self.context.socket(zmq.REP)
+        socket.bind(settings.REMOTE_ADDR_CALC)
+        while True:
+            remote.do_remote_call(socket, False, ['calc_voronoi'])
             
 class ImportThread(Thread):
     def run(self):
@@ -71,10 +80,10 @@ class Command(BaseCommand):
         remote.init()
         ctx=remote.context(True)
         remote.run_proxy( ctx)
-        gc=GeocoderThread(ctx)
-        gc.start()
-        importer=ImportThread(ctx)
-        importer.start()
+        workers=(GeocoderThread, ImportThread, CalcThread)
+        for wc in workers:
+            wc(ctx).start()
+        
         while True:
             time.sleep(60)
        

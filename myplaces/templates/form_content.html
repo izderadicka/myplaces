@@ -3,7 +3,11 @@
 {%if form.errors%}
 <ul class="r2b_errors">
 {%for name in form.errors%}
+{%if name == "__all__"%}
+<li>{{form.errors|getitem:name|join:'; '}}</li>
+{%else%}
 <li>{{name}} - {{form.errors|getitem:name|join:'; '}}</li>
+{%endif%}
 {%endfor%}
 </ul>
 {%endif%}

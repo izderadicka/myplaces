@@ -19,7 +19,8 @@ from django.contrib.auth.models import  Group
 from captcha.fields import CaptchaField, CaptchaTextInput
 from django.conf import settings
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm, SetPasswordForm,\
+    AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django import forms
@@ -27,6 +28,9 @@ from django.contrib.auth.models import User
 from django.views.generic.edit import UpdateView
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.contrib import auth
+from lockout.exceptions import LockedOut
+from django.contrib.admin.sites import AdminSite
 
 @receiver(user_activated)
 def on_user_activated(sender, **kwargs):
@@ -138,6 +142,27 @@ class ProfileView(UpdateView):
     def get_object(self):
         return self.request.user
     
+
+class AuthenticationLockForm(AuthenticationForm, LabelCssMixin):
+    
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+        if username and password:
+            try:
+                self.user_cache = auth.authenticate(username=username,
+                                           password=password)
+            except LockedOut:
+                raise ValidationError(_('Login is temporarily disabled due to high amount of unsuccessful attempts from your address - try again later'))
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'])
+            elif not self.user_cache.is_active:
+                raise forms.ValidationError(self.error_messages['inactive'])
+        self.check_for_test_cookie()
+        return self.cleaned_data
+    
+
         
     
 urlpatterns = patterns('',
@@ -166,7 +191,8 @@ urlpatterns = patterns('',
                            ),
                        url(r'^login/$',
                            auth_views.login,
-                           {'template_name': 'registration/login.html'},
+                           {'template_name': 'registration/login.html',
+                            'authentication_form': AuthenticationLockForm},
                            name='auth_login'),
                        url(r'^logout/$',
                            auth_views.logout,
