@@ -12,6 +12,7 @@ import json
 from copy import copy
 from django import test
 import myplaces.resources as resources
+from myplaces.models import PlacesGroup
 
 
 class ApiError(Exception):
@@ -184,8 +185,8 @@ class TestApi(test.LiveServerTestCase):
     def test_limit(self):
         c=ApiClient('user', 'user')
         c2=ApiClient('admin', 'admin')
-        old_limit= resources.GroupsViewSet
-        resources.GroupsViewSet.max_objects=2
+        old_limit= PlacesGroup.max_objects
+        PlacesGroup.max_objects=2
         for i in range(2):
             res=c.post(ApiClient.GROUP, {'name':'test %d'%i, 'description':'testovaci unit', 'private':False})
             
@@ -198,7 +199,7 @@ class TestApi(test.LiveServerTestCase):
             
         #but other user can create
         res=c2.post(ApiClient.GROUP, {'name':'test to succed', 'description':'testovaci unit', 'private':False}) 
-        resources.GroupsViewSet.max_objects=old_limit   
+        PlacesGroup.max_objects=old_limit   
         
     def test_create(self):
         c=ApiClient('user', 'user')

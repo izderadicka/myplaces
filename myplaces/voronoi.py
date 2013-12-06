@@ -108,14 +108,14 @@ if __name__=='__main__':
 #     x,y=np.mgrid[10:101:10, 10:101:10]
 #     z=np.array([x,y])
     #points=np.loads(data)
-    points=np.random.rand(10,2)*100  
+    #points=np.random.rand(10,2)*100  
     #z.T.reshape(100,2)#np.array([[10,10], [10, 20], [20,20], [20,10]])#
-    #from myplaces.test_cases.pivovary_data import points
-    #points=np.array(points)
+    from myplaces.test_cases.pivovary_data import points2 as points
+    points=np.array(points)
     print repr(points)
     now=time.time()
     if method=='matplotlib':
-        lines=voronoi2(points, (-20,-20, 120, 120))
+        lines=voronoi2(points, (-20037508.3427, -15538711.096, 20037508.3427, 15538711.096))#, (-20,-20, 120, 120))
     elif method=='fortune':
         sites=[Site(p[0], p[1], i) for i,p in enumerate(points)]
         vertices, _equations, edges= computeVoronoiDiagram(sites)
@@ -123,19 +123,19 @@ if __name__=='__main__':
     print 'voronoi took %f secs' % (time.time()-now, )
     #print lines
     plt.scatter(points[:,0], points[:,1], color="blue")
-    tri=matplotlib.tri.Triangulation(points[:,0], points[:,1])
-    plt.triplot(points[:,0], points[:,1], tri.triangles, color="yellow")
-    circles=circumcircle2(points[tri.triangles])
-    plt.scatter(circles[:,0], circles[:,1], 40, color='green', marker='x')
-    for i,c in enumerate(circles):
-        r=np.square(c-points[tri.triangles[i][0]])
-        r=np.sqrt(r[0]+r[1])
-        circle=plt.Circle(c, r, color='lightgrey', fill=False )
-        plt.gca().add_artist(circle)
+    #tri=matplotlib.tri.Triangulation(points[:,0], points[:,1])
+    #plt.triplot(points[:,0], points[:,1], tri.triangles, color="yellow")
+    #circles=circumcircle2(points[tri.triangles])
+#     plt.scatter(circles[:,0], circles[:,1], 40, color='green', marker='x')
+#     for i,c in enumerate(circles):
+#         r=np.square(c-points[tri.triangles[i][0]])
+#         r=np.sqrt(r[0]+r[1])
+#         circle=plt.Circle(c, r, color='lightgrey', fill=False )
+#         plt.gca().add_artist(circle)
     lines = matplotlib.collections.LineCollection(lines, color='red')
     plt.gca().add_collection(lines)
     #plt.axis((10,20, 47,53))
-    plt.axis((-20,120, -20,120))
+    plt.axis((-20037508.3427,  20037508.3427, -15538711.096, 15538711.096))#(-20,120, -20,120))
     plt.show()
 
 

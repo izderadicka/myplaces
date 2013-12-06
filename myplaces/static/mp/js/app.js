@@ -479,6 +479,12 @@ var myPlacesApp=(function() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 // router/controller
 	var staticPrefix='/mp/info/';
+	var showStatic= function(page) {
+		if (fullSite) {
+			router.listGroups();
+		}
+		$(rightPanel).load(staticPrefix+page);
+	};
 	var App = Backbone.Router.extend({
 		routes : {
 			"group/new" : "addGroup",
@@ -488,18 +494,14 @@ var myPlacesApp=(function() {
 			"group/:id": "groupDetail",
 			"map/:gid": "showMap",
 			"map/:gid/:id": "showMap",
-			"about": "showStatic",
+			"about": _.partial(showStatic, 'about'),
+			"contribute": _.partial(showStatic, 'contribute'),
+			"terms": _.partial(showStatic, 'terms'),
+			"contact": _.partial(showStatic, 'contact'),
 			"" : "defaultRoute"
 
 		},
 		
-		showStatic: function() {
-			if (fullSite) {
-				this.listGroups();
-			}
-			$(rightPanel).load(staticPrefix+'about');
-		},
-
 		showMap: function(gid,id){
 			
 			var map=$('<div>').attr('id', 'map').appendTo('body');

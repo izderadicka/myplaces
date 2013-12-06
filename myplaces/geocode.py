@@ -308,9 +308,11 @@ def geocode_remote(adr, alternate=False, reverse=False, timer=None):
 def get_coordinates_remote(adr, alternate=False, reverse=False, context=None):      
     ctx=context or remote.context()   
     socket=ctx.socket(zmq.REQ)  
-    socket.connect(settings.REMOTE_ADDR_GEOCODE)
-    
-    pos=remote.call_remote(socket, 'geocode_remote', (adr, alternate, reverse),  timeout=60)
+    try:
+        socket.connect(settings.REMOTE_ADDR_GEOCODE)
+        pos=remote.call_remote(socket, 'geocode_remote', (adr, alternate, reverse),  timeout=60)
+    finally:
+        socket.close()
     
     if not pos[0]:
         raise NotFound

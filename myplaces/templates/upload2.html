@@ -57,7 +57,11 @@ function submitForm() {
 		log.on('progress', function(msg) {
 			$('#progress .counter').text(msg.line);
 			$('#progress .total').text(msg.total);
-			var progress=Math.round(100*msg.line/msg.total);
+			var progress=0
+			if (msg.total) { 
+				progress=Math.round(100*msg.line/msg.total);
+				if (progress>100) progress=100;
+			}
 			$('#progress .bar').css('width', progress+'%')
 			
 		});

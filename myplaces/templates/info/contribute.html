@@ -1,0 +1,51 @@
+{% load url from future %}
+{% load i18n %} 
+<div id="about_page">
+<h3>{% trans 'How to contribute'%}</h3>
+
+{%blocktrans%}
+MyPlaces is an open project so anybody, who finds it compelling and interesting, can contribute.
+
+You can contribute by:
+<ul>
+<li><span class="small_title">Financial donations</span><br>
+See below for details how to make donation to our project.
+</li>
+<li><span class="small_title">Developing the application</span><br>
+Source code is <a href="https://github.com/izderadicka/myplaces">on github</a> so you can join us there.   
+Required skills are python (django), javascript, HTML5, GIS (PostGIS, Geodjango).
+</li>
+<li><span class="small_title">Documenting the software</span><br>
+Are you enjoying creation of nice user or developers docs.  You are more then welcomed - please join us 
+<a href="https://github.com/izderadicka/myplaces">on github</a>.
+</li>
+<li><span class="small_title">Adding useful content to the site</span><br>
+Interesting collections of places are the very core of this service - if you have some add them to MyPlaces. </li>
+<li><span class="small_title">Proposing improvements and new features</span><br>
+If you have any idea how to improve our service by new cool functionality, let us know.
+</li>
+</ul>
+
+
+{%endblocktrans%}
+
+<h3>{%trans 'Financial donations'%}</h3>
+{%blocktrans%}
+MyPlaces is a free service,  but its development and operations require some financing. Any contribution will be 
+fully used for this project only.  <br>
+As an appreciation for your support for any contribution higher then 10 USD we will enable 
+Premium Features for you for 1 year period.
+
+You can donate now by clicking this button:
+<br>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+Transaction is securely handled via PayPal.
+{%endblocktrans%}
+
+

@@ -11,7 +11,7 @@ import os
 import sys
 #os.environ['DJANGO_SETTINGS_MODULE']='settings'
 from django.test import TestCase as DjangoTestCase
-
+from django.contrib.auth.models import User
 
 from django.test.utils import setup_test_environment
 setup_test_environment()
@@ -39,10 +39,12 @@ class ImportTest1(DjangoTestCase):
         
 from myplaces.models import Place 
 class ImportTest2(DjangoTestCase):
-     
+    fixtures=[ "test_data_auth.json", ] 
     def test_import(self):
+        user=User.objects.get(username='admin')
         mapping= {u'url': 4, 'position': -4, u'name': 0, u'address': {u'unformatted': 1, u'phone': 5, u'email': 6}}
-        errors=implaces.import_places(CSV_FILE, mapping, name='test')  
+        errors=implaces.import_places(CSV_FILE, mapping, name='test', user=user)  
+        print errors
         self.assertEqual(len(errors), 2)
         self.assertEqual(Place.objects.all().count(), 210)
         

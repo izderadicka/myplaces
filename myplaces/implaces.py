@@ -14,7 +14,7 @@ from collections import defaultdict
 from myplaces.geocode import get_coordinates
 from myplaces import geocode, remote
 log=logging.getLogger('mp.implaces')
-from models import Place, Address, PlacesGroup
+from models import Place, Address, PlacesGroup, MaxObjectsLimitReached
 from django.db import transaction
 
 class UTF8Recoder:
@@ -228,7 +228,6 @@ def import_places(temp_file, mapping, name, description=None, private=False,
                             address=Address(**address_data)
                         place.description=get_existing('description')
                         place.url=get_existing('url')
-                        place.address=address
                         pos_template=POINT_TEMPLATE
                         if mapping.has_key('position'):
                             pos=mapping['position']
@@ -268,7 +267,12 @@ def import_places(temp_file, mapping, name, description=None, private=False,
 #                                 raise LineError(_('Data Error (%s)')% str(e))
                             place.position=point
                         try:
+                            address.save(user=user)
+                            place.address=address
                             place.save(user=user)
+                        except MaxObjectsLimitReached:
+                            add_error(line, _('Reached limit of records per user'))   
+                            break
                         except Exception, e:
                             raise LineError( _('Error saving line (%s)')%str(e))
                 except LineError,e:

@@ -3,7 +3,7 @@ Created on Nov 27, 2013
 
 @author: ivan
 '''
-import myplaces.remote as remote
+import remote
 import zmq
 import argparse
 
@@ -12,7 +12,7 @@ RUNNING=0
 def process_msg(stream_id, mtype, data):
     global RUNNING
     if mtype=='term':
-        return
+        return True
     elif mtype=='measurement':
         print '%d:%s - %d %s %f' % ((RUNNING, stream_id,)+data)
         if log:
@@ -25,7 +25,7 @@ def process_msg(stream_id, mtype, data):
         
         
 
-ADDR='tcp://127.0.0.1:10101'
+ADDR='tcp://*:10101'
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     p.add_argument('--file', help='results file')

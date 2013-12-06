@@ -207,10 +207,12 @@ if __name__ == "__main__":
     def finish(sig, frame):
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, finish )
-    time.sleep(0.1)
+    remote.send_msg(socket, proc_id, 'ping', (time.time(),))
+    time.sleep(1)
     remote.send_msg(socket, proc_id, 'start', (time.time(),))
     try:
         unittest.main(argv=sys.argv[:1])
     finally:
         remote.send_msg(socket, proc_id, 'stop', (time.time(),))
+        socket.close()
     

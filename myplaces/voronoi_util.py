@@ -14,10 +14,11 @@ from django.conf import settings
 def voronoi_remote(group_id, context=None):
     ctx=context or remote.context()   
     socket=ctx.socket(remote.zmq.REQ)  # @UndefinedVariable
-    socket.connect(settings.REMOTE_ADDR_CALC)
-    
-    json= remote.call_remote(socket, 'calc_voronoi', (group_id,),  timeout=60)
-    
+    try:
+        socket.connect(settings.REMOTE_ADDR_CALC)
+        json= remote.call_remote(socket, 'calc_voronoi', (group_id,),  timeout=60)
+    finally:
+        socket.close()
     return json
 
 @remote.is_remote
@@ -31,17 +32,20 @@ def calc_voronoi(group_id):
     if group.places.all().count()>=3:
         q=group.places.all().transform(srid=3857)
         points= [(p.position.x, p.position.y) for p in  q]
-        
-        bbox=q.extent()
-        xsize=(bbox[2]-bbox[0])/3.0
-        ysize=(bbox[3]-bbox[1])/3.0
-        bbox=(bbox[0]-xsize, bbox[1]-ysize, bbox[2]+xsize, bbox[3]+ysize)
+#         xlim, ylim=20037508.3427, 15538711.096
+#         bbox=q.extent()
+#         xsize=(bbox[2]-bbox[0])/3.0
+#         ysize=(bbox[3]-bbox[1])/3.0
+#         xmin,ymin, xmax, ymax=bbox[0]-xsize, bbox[1]-ysize, bbox[2]+xsize, bbox[3]+ysize
+#         bbox=(xmin if xmin>-180 else -180,ymin if ymin>-90 else -90, 
+#              xmax if xmax<180 else 180, ymax if ymax<90 else 90)
+        bbox=(-179.99, -80, 179.99,80)
         bbox2=(Point(bbox[0], bbox[1], srid=4326).transform(3857, True),
               Point(bbox[2], bbox[3], srid=4326).transform(3857, True))
         bbox2=(bbox2[0][0], bbox2[0][1], bbox2[1][0], bbox2[1][1])
-       
         lines=voronoi2(points, bbox2)
-        lines=map(lambda p: (Point(*p[0], srid=3857).transform(4326, True), 
+            
+        lines=map(lambda p: (Point(*p[0], srid=3857).transform(4326, True),
                              Point(*p[1], srid=3857).transform(4326, True)), lines)
         
         result={"type":"FeatureCollection",

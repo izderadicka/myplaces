@@ -15,6 +15,9 @@ class ModManager(models.Manager):
             obj=self.model(**kwargs)
             return obj, True
 
+class MaxObjectsLimitReached(Exception):
+    pass
+
 class Auditable (models.Model):
     created=models.DateTimeField(_('Created'), auto_now_add=True, editable=False)
     modified=models.DateTimeField(_('Modified'), auto_now=True, editable=False)
@@ -44,16 +47,42 @@ class Auditable (models.Model):
             except User.DoesNotExist:
                 user=None
         self.update_user(user)
+        if not self.pk and not self.is_within_limit(self.created_by):
+            raise MaxObjectsLimitReached(_('Reached limit of maximum objects per user'))
         if self.pk:
             self.updates+=1
         super(Auditable,self).save(*args, **kwargs)
     objects=ModManager()
     class Meta ():
         abstract=True;
+        
+        
+    #limits maximum number of objects per user     
+    max_objects=None
+    max_objects_higher=None
+    
+    def get_count(self, user):
+        return self.__class__.objects.filter(created_by=user).count()
+        
+    def get_limit(self, user):
+        if user and user.has_perm('myplaces.higher_limit_'+ self._meta.module_name):
+            return self.max_objects_higher
+        return self.max_objects
+        
+    def is_within_limit(self, user):
+        limit=self.get_limit(user)
+        if not limit:
+            return True
+        if self.get_count(user)>=limit:
+            return False
+        return True
     
 
 
 class PlacesGroup(Auditable):
+    max_objects=29
+    max_object_higher=99
+    
     name=models.CharField(_('Name'), max_length=80, null=False, blank=False)
     description=models.CharField(_('Description'), max_length=200, null=True, blank=True)
     private=models.BooleanField(_('Private'), default=False)
@@ -82,6 +111,9 @@ class PlacesGroup(Auditable):
         )
     
 class Address(Auditable):
+    max_objects=29*199
+    max_objects_higher=99*499
+    
     street=models.CharField(_('Street'), max_length=80, null=True, blank=True)
     city=models.CharField(_('City'), max_length=80, null=True, blank=True)
     county=models.CharField(_('County'), max_length=80, null=True, blank=True)
@@ -118,6 +150,13 @@ class Address(Auditable):
                       )
     
 class Place(Auditable):
+    max_objects=199
+    max_objects_higher=499
+    
+    def get_count(self,user):
+        return Place.objects.filter(created_by=user, group=self.group).count()
+    
+    
     name=models.CharField(_('Name'), max_length=80, null=False, blank=False)
     description=models.CharField(_('Description'), max_length=200, null=True, blank=True)
     group=models.ForeignKey(PlacesGroup, blank=False, null=False, related_name="places", 

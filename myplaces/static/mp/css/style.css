@@ -116,6 +116,8 @@ body {
     color: inherit;
     font-weight: bold;
     text-decoration: none;
+    width: 100%;
+    display:block;
 }
 #main_menu_displayed {
     position: absolute;
@@ -424,6 +426,7 @@ form .small_btn {
     float: right;
     height: 32px;
     width: 32px;
+    clear: right;
 }
 .address {
     clear: left;

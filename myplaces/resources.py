@@ -4,7 +4,7 @@ Created on Aug 19, 2013
 @author: ivan
 '''
 import re
-from models import Place, PlacesGroup, Address
+from models import Place, PlacesGroup, Address, MaxObjectsLimitReached
 from rest_framework import serializers, viewsets, permissions, exceptions,\
     fields, status
 from rest_framework.views import APIView
@@ -22,6 +22,7 @@ from django.core.exceptions import ValidationError
 import widgets as custom_widgets
 from rest2backbone import widgets as r2b_widgets
 from django.db.models.query_utils import Q
+from myplaces.models import MaxObjectsLimitReached
 
 
 class FilterError(exceptions.APIException):
@@ -50,33 +51,16 @@ class LimitCreateMixin(object):
     """
     Limits number of created objects per user
     """
-    max_objects=None
-    max_objects_higher=None
-    
-    def get_count(self,object, request):
-        return self.get_queryset().filter(created_by=request.user).count()
-        
-    def get_limit(self, object, request):
-        if request.user.has_perm('myplaces.higher_limit_'+ object.__class__._meta.module_name):
-            return self.max_objects_higher
-        return self.max_objects
-        
-    def is_within_limit(self, object, request):
-        limit=self.get_limit(object, request)
-        if not limit:
-            return True
-        if self.get_count(object,request)>=limit:
-            return False
-        return True
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.DATA, files=request.FILES)
 
         if serializer.is_valid():
-            if not self.is_within_limit(serializer.object, request):
-                return Response({'':[_('Reached maximum number of records per user')]}, status=status.HTTP_400_BAD_REQUEST)
             self.pre_save(serializer.object)
-            self.object = serializer.save(force_insert=True)
+            try:
+                self.object = serializer.save(force_insert=True, user=request.user)
+            except MaxObjectsLimitReached:
+                return Response({'':[_('Reached maximum number of records per user')]}, status=status.HTTP_400_BAD_REQUEST)
             self.post_save(self.object, created=True)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED,
@@ -150,8 +134,6 @@ class AddressesSerializer(BaseSerializer):
         
         
 class AddressesViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
-    max_objects=29*199
-    max_objects_higher=99*499
     queryset=Address.objects.all()
     serializer_class=AddressesSerializer
     
@@ -190,14 +172,10 @@ class PlacesSerializer(BaseSerializer):
         fields=['id',  'name', 'position', 'address', 'address_string', 'url', 'description', 'group', 'is_mine']
         
 class PlacesViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
-    max_objects=199
-    max_objects_higher=499
+    
     queryset=Place.objects.all()
     serializer_class=PlacesSerializer
     filter_class=PlacesFilter
-    
-    def get_count(self,object, request):
-        return self.get_queryset().filter(created_by=request.user, group=object.group).count()
     
     _allowed_units=('m','km','mi', 'ft')
     _dist_re=re.compile('^(\d+\.?\d*)(\w{1,3})?$', re.IGNORECASE)
@@ -261,8 +239,6 @@ class GroupsSerializer(BaseSerializer):
         fields=['id', 'name', 'description', 'private', 'is_mine', 'count']
         
 class GroupsViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
-    max_objects=29
-    max_object_higher=99
     queryset=PlacesGroup.objects.all()
     serializer_class=GroupsSerializer
     filter_class=GroupsFilter
