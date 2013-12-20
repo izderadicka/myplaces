@@ -1,0 +1,21 @@
+{%extends 'upload2.html'%}
+{% load url from future %}
+{% load i18n %} 
+{% load headers_mapping%}
+{%block format_specific%}
+<p class="form_help">
+{%blocktrans%}
+Now map columns in CSV file to appropriate fields in MyPlaces database<br>
+{%endblocktrans%}
+</p>
+
+ <div id="mapping_table">
+	<table id="import_table">
+	<tr>{%for h in headers%}<th>{{h}}</th>{%endfor%}</tr>
+	<tr class="subheader">{%for l in max_lens%}<td>{{l}}</td>{%endfor%}</tr>
+	<tr class="mapping">{%headers_mapping%}
+	</tr>
+	{%for r in sample_lines%}<tr class="line">{%for c in r%}<td>{{c}}</td>{%endfor%}</tr>{%endfor%}
+	</table>
+	</div>
+{%endblock%}

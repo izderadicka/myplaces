@@ -170,13 +170,8 @@ class PlacesSerializer(BaseSerializer):
     class Meta:
         model= Place
         fields=['id',  'name', 'position', 'address', 'address_string', 'url', 'description', 'group', 'is_mine']
-        
-class PlacesViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
-    
-    queryset=Place.objects.all()
-    serializer_class=PlacesSerializer
-    filter_class=PlacesFilter
-    
+
+class PlacesSearchMixin(object):
     _allowed_units=('m','km','mi', 'ft')
     _dist_re=re.compile('^(\d+\.?\d*)(\w{1,3})?$', re.IGNORECASE)
     _dist_q_re=re.compile(r'^within\s+(\d+\.?\d*\w{1,3})?\s+from\s+(\d+\.?\d*,\s*\d+\.?\d*)$')
@@ -211,6 +206,15 @@ class PlacesViewSet(UserMixin, LimitCreateMixin, ViewSetWithIndex):
                 raise FilterError(str(e))
             qs=qs.filter(position__distance_lte=(Point(lng,lat, srid=4326), Distance(**dist)))
         return qs
+
+        
+class PlacesViewSet(UserMixin, LimitCreateMixin, PlacesSearchMixin, ViewSetWithIndex):
+    
+    queryset=Place.objects.all()
+    serializer_class=PlacesSerializer
+    filter_class=PlacesFilter
+    
+   
             
             
     

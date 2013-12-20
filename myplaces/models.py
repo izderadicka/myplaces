@@ -90,13 +90,14 @@ class PlacesGroup(Auditable):
     def __unicode__(self):
         return self.name
     
-    def as_geojson(self):
+    def as_geojson(self,  places=None, details=False):
         str_file=StringIO()
         str_file.write('{"type":"FeatureCollection", "features":[')
-        places=self.places.all().order_by('name')
+        if not places:
+            places=self.places.all().order_by('name')
         length=places.count()
         for pos,p in enumerate(places) :
-            str_file.write(p.as_geojson())
+            str_file.write(p.as_geojson(details))
             if pos < length-1:
                 str_file.write(', ')
         str_file.write(']}')
@@ -168,14 +169,33 @@ class Place(Auditable):
     
     objects = models.GeoManager()
     
-    def as_geojson(self):
+    def as_geojson(self, details=False):
         
         data={'type':'Feature',
               'id': self.id,
               'geometry': {'type':'Point', 'coordinates':[self.position.x, self.position.y]},
-              'properties':{'name':self.name, 'url':self.url, 
-                            'address': self.address.__unicode__() if self.address else None,
-                            'description':self.description}}
+              'properties':{'name':self.name,}}
+        
+        if details:
+            if self.url:
+                data['properties']['url']=self.url
+                if self.description:
+                    data['properties']['description']=self.description
+        else:
+            if self.description:
+                data['properties']['description'] =self.description if len(self.description)<=80 else \
+                    self.description[:77]+'...'
+                
+        if self.address:
+            if details:
+                adr={}
+                for name in ['street', 'city', 'county', 'state', 'country', 'postal_code', 'phone', 'email']:
+                    if getattr(self.address, name):
+                        adr[name]=getattr(self.address,name)
+            else:
+                adr=self.address.__unicode__()
+            data['properties']['address']=adr
+        
         return json.dumps(data)
     
     def __unicode__(self):

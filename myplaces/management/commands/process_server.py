@@ -19,8 +19,8 @@ from myplaces.voronoi_util import calc_voronoi #must import to register remote m
 
 
 @remote.is_remote
-def import_places(stream_id, temp_file, mapping, name, description, 
-                  private,  user,  existing='update', encoding='utf-8'):
+def import_places(stream_id, temp_file, extra_params, name, description, 
+                  private,  user,  existing='update', format='CSV', encoding='utf-8'):
     ctx=remote.context(True)
     pub_socket=remote.create_socket(ctx, 'pub')
     def report_error(line,msg):
@@ -29,8 +29,8 @@ def import_places(stream_id, temp_file, mapping, name, description,
         remote.send_msg(pub_socket, stream_id, 'progress', {'line':line, 'total':total})
         
     try:    
-        implaces.import_places(temp_file, mapping, name, description, private, user, existing, encoding,  
-                               report_error, report_progress, context=ctx)
+        implaces.import_places(temp_file, extra_params, name, description, private, user, existing, encoding,  
+                               report_error, report_progress, context=ctx, format=format)
         remote.send_msg(pub_socket, stream_id, 'done', '')
     finally:
         pub_socket.close()

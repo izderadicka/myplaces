@@ -14,12 +14,15 @@ from fortune import computeVoronoiDiagram, Site
 
 def circumcircle2(T):
     P1,P2,P3=T[:,0], T[:,1], T[:,2]
-    delta_a = P2 - P1
-    delta_b = P3 - P2
-    aSlope = delta_a[:,1]/delta_a[:,0]
-    bSlope = delta_b[:,1]/delta_b[:,0]
-    center_x= (aSlope*bSlope*(P1[:,1] - P3[:,1]) + bSlope*(P1[:,0] + P2 [:,0]) - aSlope*(P2[:,0]+P3[:,0]) )/(2* (bSlope-aSlope))
-    center_y = -1*(center_x - (P1[:,0]+P2[:,0])/2)/aSlope + (P1[:,1]+P2[:,1])/2;
+    b = P2 - P1
+    c = P3 - P1
+    
+    #x=( C'_y(B^{'2}_x + B^{'2}_y) - B'_y(C^{'2}_x + C^{'2}_y) )/ D', \,
+    #y=( B'_x(C^{'2}_x + C^{'2}_y) - C'_x(B^{'2}_x + B^{'2}_y) )/ D' \,
+    #D' = 2( B'_xC'_y - B'_yC'_x ). \, 
+    d=2*(b[:,0]*c[:,1]-b[:,1]*c[:,0])
+    center_x=(c[:,1]*(np.square(b[:,0])+np.square(b[:,1]))- b[:,1]*(np.square(c[:,0])+np.square(c[:,1])))/d + P1[:,0]
+    center_y=(b[:,0]*(np.square(c[:,0])+np.square(c[:,1]))- c[:,0]*(np.square(b[:,0])+np.square(b[:,1])))/d + P1[:,1]
     return np.array((center_x, center_y)).T
 
 def check_outside(point, bbox):
@@ -110,12 +113,19 @@ if __name__=='__main__':
     #points=np.loads(data)
     #points=np.random.rand(10,2)*100  
     #z.T.reshape(100,2)#np.array([[10,10], [10, 20], [20,20], [20,10]])#
-    from myplaces.test_cases.pivovary_data import points2 as points
-    points=np.array(points)
+    #from myplaces.test_cases.pivovary_data import points2 as points
+    
+#     from myplaces.models import PlacesGroup
+#     group=PlacesGroup.objects.get(id=27)
+#     q=group.places.all().transform(srid=3857)
+#     points= [(p.position.x, p.position.y) for p in  q]
+
+    points=[[-10,-10], [-10,10], [10,-10], [10,10]]
+    points=np.array(points, dtype=np.float)
     print repr(points)
     now=time.time()
     if method=='matplotlib':
-        lines=voronoi2(points, (-20037508.3427, -15538711.096, 20037508.3427, 15538711.096))#, (-20,-20, 120, 120))
+        lines=voronoi2(points,  (-20,-20, 120, 120)) #(-20037508.3427, -15538711.096, 20037508.3427, 15538711.096))#
     elif method=='fortune':
         sites=[Site(p[0], p[1], i) for i,p in enumerate(points)]
         vertices, _equations, edges= computeVoronoiDiagram(sites)
@@ -123,19 +133,19 @@ if __name__=='__main__':
     print 'voronoi took %f secs' % (time.time()-now, )
     #print lines
     plt.scatter(points[:,0], points[:,1], color="blue")
-    #tri=matplotlib.tri.Triangulation(points[:,0], points[:,1])
-    #plt.triplot(points[:,0], points[:,1], tri.triangles, color="yellow")
-    #circles=circumcircle2(points[tri.triangles])
-#     plt.scatter(circles[:,0], circles[:,1], 40, color='green', marker='x')
-#     for i,c in enumerate(circles):
-#         r=np.square(c-points[tri.triangles[i][0]])
-#         r=np.sqrt(r[0]+r[1])
-#         circle=plt.Circle(c, r, color='lightgrey', fill=False )
-#         plt.gca().add_artist(circle)
+    tri=matplotlib.tri.Triangulation(points[:,0], points[:,1])
+    plt.triplot(points[:,0], points[:,1], tri.triangles, color="yellow")
+    circles=circumcircle2(points[tri.triangles])
+    plt.scatter(circles[:,0], circles[:,1], 40, color='green', marker='x')
+    for i,c in enumerate(circles):
+        r=np.square(c-points[tri.triangles[i][0]])
+        r=np.sqrt(r[0]+r[1])
+        circle=plt.Circle(c, r, color='lightgrey', fill=False )
+        plt.gca().add_artist(circle)
     lines = matplotlib.collections.LineCollection(lines, color='red')
     plt.gca().add_collection(lines)
     #plt.axis((10,20, 47,53))
-    plt.axis((-20037508.3427,  20037508.3427, -15538711.096, 15538711.096))#(-20,120, -20,120))
+    plt.axis((-20,120, -20,120)) #(-20037508.3427,  20037508.3427, -15538711.096, 15538711.096))
     plt.show()
 
 

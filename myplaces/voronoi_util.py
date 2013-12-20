@@ -10,6 +10,8 @@ import json
 from django.contrib.gis.geos import Point
 import remote
 from django.conf import settings
+import math
+import numpy
 
 def voronoi_remote(group_id, context=None):
     ctx=context or remote.context()   
@@ -20,6 +22,22 @@ def voronoi_remote(group_id, context=None):
     finally:
         socket.close()
     return json
+
+def to_list(lines):
+    result=[]
+    def check_invalid(p):
+        if len(p)!=2:
+            return True
+        for v in p:
+            if v is None or not numpy.isfinite(v):
+                return True
+                
+    for l in lines:
+        if check_invalid(l[0]) or check_invalid(l[1]):
+            continue
+        result.append([list(l[0]), list(l[1])])
+    return result
+        
 
 @remote.is_remote
 def calc_voronoi(group_id):
@@ -51,7 +69,7 @@ def calc_voronoi(group_id):
         result={"type":"FeatureCollection",
                 'features':[
                 { 'type':'Feature',
-                 'geometry':{'type':'MultiLineString', 'coordinates':[[list(l[0]), list(l[1])] for l in lines]}},
+                 'geometry':{'type':'MultiLineString', 'coordinates':to_list(lines)}},
                 {'type':'Feature',
                  'geometry':{'type': 'Polygon', 'coordinates': [[[bbox[0], bbox[1]], [bbox[2], bbox[1]], 
                                                                 [bbox[2], bbox[3]], [bbox[0], bbox[3]],

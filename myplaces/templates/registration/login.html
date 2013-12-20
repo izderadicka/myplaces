@@ -4,12 +4,12 @@
 {%block title%}
 {% trans 'User Login' %}
 {%endblock%}
-{%block header%}{% trans 'User Login' %}{%endblock%}
+{%block header%}{% trans 'User Log In' %}{%endblock%}
 {%block content%}
 <div class="login_form_separate">
 <form method="post" action="{% url 'auth_login' %}">
 {%include 'form_content.html'%}
-<input type="submit" value="{%trans 'Login'%}" />
+<input type="submit" value="{%trans 'Log In'%}" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 {%if form.errors %}

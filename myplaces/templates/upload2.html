@@ -8,8 +8,8 @@
 <script type="text/javascript">
 <!--
 
-var baseUrl='https://'+window.location.host
-var log=null,
+var baseUrl='https://'+window.location.host,
+log=null,
 firstAttempt=null;
 function submitForm() {
 	$('#submit_btn').prop('disabled',true);
@@ -71,7 +71,8 @@ function submitForm() {
 		});
 		
 		log.on('done', function(msg) {
-			$('#results #main_message').text(gettext('Import finished'));
+			$('#results #main_message').html(gettext('Import finished')+'- <a href="javascript:closePage()">'
+					+gettext('Close this page')+'</a>');
 			$('#progress .bar').css('width', '100%');
 		});
 	}
@@ -85,31 +86,25 @@ function submitForm() {
 	}
 	
 }
+
+function closePage() {
+	window.opener.location.reload();
+	window.close();
+}
 //-->
 </script>
 {%endblock%}
 {%block content%}
 <div id="form_section">
-<p class="form_help">
-{%blocktrans%}
-Now map columns in CSV file to appropriate fields in MyPlaces database<br>
-{%endblocktrans%}
-</p>
 
 <ul class='r2b_errors'></ul>
 <form method="POST" action="{%url 'upload-places' step%}" id="col_mapping_form">
 <input type="hidden" name="step_1" value="{{step_1}}"/>
  {% csrf_token %}
+ 
+{%block format_specific%}
+{%endblock%}
 
- <div id="mapping_table">
-	<table id="import_table">
-	<tr>{%for h in headers%}<th>{{h}}</th>{%endfor%}</tr>
-	<tr class="subheader">{%for l in max_lens%}<td>{{l}}</td>{%endfor%}</tr>
-	<tr class="mapping">{%headers_mapping%}
-	</tr>
-	{%for r in sample_lines%}<tr class="line">{%for c in r%}<td>{{c}}</td>{%endfor%}</tr>{%endfor%}
-	</table>
-	</div>
 {%if group_exists%}
 <div id="import_type_selector" class="r2b_field_row">
 <label for="id_update_type">{%trans 'How to update existing places:'%}</label>
@@ -119,6 +114,12 @@ Now map columns in CSV file to appropriate fields in MyPlaces database<br>
 <option value="remove">{%trans 'Remove all existing places within group and import new'%}</option>
 </select>
 </div>
+{%else%}
+<script>
+$(function() {
+	$('#submit_btn').click();
+});
+</script>
 {%endif%}
 <input type="button" value="Import" onclick="submitForm()" id='submit_btn'/>
 </form>

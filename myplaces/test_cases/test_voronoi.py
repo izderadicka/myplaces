@@ -4,13 +4,14 @@ Created on Sep 30, 2013
 @author: ivan
 '''
 import unittest
-from myplaces.voronoi import move_point, check_outside, voronoi2
+from myplaces.voronoi import move_point, check_outside, voronoi2, circumcircle2
 import numpy as np
 from django import test
 import json
 import subprocess
 import os
 from myplaces import remote
+import numpy
 
 class TestVoronoi(unittest.TestCase):
 
@@ -43,6 +44,14 @@ class TestVoronoi(unittest.TestCase):
         for i,l in enumerate(lines):
             self.assertTrue(not check_outside(l[0], bbox), 'line %d point x outside bbox'%i)
             self.assertTrue(not check_outside(l[1], bbox), 'line %d point y outside bbox'%i)
+            
+    def test_cc(self):
+        data=[[[-10, -10], [ 10, -10],   [ 10,  10]],
+                [[-10,  10],   [-10, -10],  [ 10,  10]]]
+        triangles=numpy.array(data, dtype=numpy.float)
+        centers=circumcircle2(triangles)
+        print centers
+        self.assertTrue(centers[0,0]==0 and centers[0,1]==0 and centers[1,0]==0 and centers[1,1]==0)
 
 
 import myplaces.views  as views          

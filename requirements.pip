@@ -10,3 +10,4 @@ django-registration>=1.0.0
 django-simple-captcha>=0.4.0
 gevent_psycopg2>=1.0
 django-lockout>=0.1.1
+lxml>=3.1.0

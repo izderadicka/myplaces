@@ -188,7 +188,7 @@ class OSMNominatim(CoderMixin, geocoders.OpenMapQuest):
         if address.get('house_number') and street:
             street+=' '+address['house_number']
         parsed_address.street=street
-        parsed_address.city=address.get('city')
+        parsed_address.city=address.get('city') or address.get('town')
         parsed_address.country=address.get('country')
         parsed_address.county=address.get('county')
         parsed_address.state=address.get('state')

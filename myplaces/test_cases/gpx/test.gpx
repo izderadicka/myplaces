@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx
+xmlns="http://www.topografix.com/GPX/1/1"
+xmlns:gpxx = "http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd
+http://www.garmin.com/xmlschemas/GpxExtensions/v3
+http://www8.garmin.com/xmlschemas/GpxExtensions/v3/GpxExtensionsv3.xsd"
+version="1.1"
+creator="gpx-poi.com">
+
+   <wpt lat="50.088652" lon="14.421625">
+      <time>2013-12-08T06:16:34Z</time>
+      <name>Test</name>
+      <desc>Bla Bla Test Bla Bla</desc>
+      <extensions>
+         <gpxx:WaypointExtension>
+            <gpxx:Address>
+               <gpxx:StreetAddress>Dlouha 1</gpxx:StreetAddress>
+               <gpxx:City>Praha</gpxx:City>
+               <gpxx:State>Hlavn msto Praha</gpxx:State>
+               <gpxx:Country>CZ</gpxx:Country>
+               <gpxx:PostalCode>110 00</gpxx:PostalCode>
+            </gpxx:Address>
+            <gpxx:PhoneNumber Category="Phone">483120002</gpxx:PhoneNumber>
+            <gpxx:PhoneNumber Category="Email">email@sample.com</gpxx:PhoneNumber>
+            <gpxx:PhoneNumber Category="URL">http://sample.com</gpxx:PhoneNumber>
+         </gpxx:WaypointExtension>
+      </extensions>
+   </wpt>
+
+</gpx>

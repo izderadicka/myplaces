@@ -77,7 +77,7 @@ var myPlacesApp=(function() {
 			}
 		};
 		
-		cache.peak=function() {
+		cache.peek=function() {
 			return list;
 		};
 		
@@ -118,7 +118,7 @@ var myPlacesApp=(function() {
 	
 	var getOrLoad = function(name, model, id) {
 		var g,
-		list=listCache[name].peak(),
+		list=listCache[name].peek(),
 		d=$.Deferred();
 		
 		if (list && list.get(id)) {
@@ -264,7 +264,10 @@ var myPlacesApp=(function() {
 		getAddress: function() {
 			var loc= formsAPI.getWidget('position', this.$el).get(),
 			root=this.$el;
-			if (!loc) alert(gettext('Location is empty, first define location to use geocoding'));
+			if (!loc) {
+				alert(gettext('Location is empty or invalid, first define location to use geocoding'));
+				return;
+			}
 			postJson('/mp/api/geocode/reverse', {position:loc}, this)
 			.done(function(data){
 				if (! data.address) {
@@ -473,6 +476,37 @@ var myPlacesApp=(function() {
 		},
 		extraQuery:function() {
 			return {group:this.model.id};
+		},
+		
+		events : _.extend({
+			'click #export_btn': 'showExportMenu',
+		}, ViewWithList.prototype.events),
+		
+		showExportMenu:function(event) {
+			var btn = $(event.currentTarget),
+			view=this;
+			if ($('#export_menu_displayed', this.$el).length>0) {
+				$('#export_menu_displayed', this.$el).remove();
+			} else {
+				var m=$('<div>').attr('id', 'export_menu_displayed')
+				.mouseleave(function() {
+					m.remove();
+				})
+				.html($('#export_menu').html())
+				.css({'position':'absolute','top': (btn.position().top +40+'px'), 'right': 10+'px'})
+				.on('click', 'a', function() {
+					m.remove();
+					view.callExport($(this).attr('data-format'));
+					return false;
+				});
+				this.$el.append(m);
+				
+			}
+		},
+		
+		callExport: function(fmt) {
+			var query=this.listCache.peek().query;
+			window.location='/mp/export/group/'+query.group+'/'+fmt+'/?'+$.param(_.pick(query,'ordering', 'q'));
 		}
 	});
 	
@@ -503,7 +537,10 @@ var myPlacesApp=(function() {
 		},
 		
 		showMap: function(gid,id){
-			
+			$(rightPanel).empty();
+			if (leftPanel!==rightPanel) {
+				$(leftPanel).empty();
+			}
 			var map=$('<div>').attr('id', 'map').appendTo('body');
 			window.scrollTo(0,0);
 			$('#map').show();
@@ -686,7 +723,7 @@ var customWidgets= (function () {
 		getValue:function() {
 			var raw=_.map($('input', this.elem).val().split(','),
 					function(x) {return x.trim();}),
-			numRe=/^\d+\.?\d*$/;
+			numRe=/^-?\d+\.?\d*$/;
 			if (raw.length!=2) return this.error(gettext('Location format must be lat,lng'));
 			for (var i=0; i<raw.length; i+=1 ) {
 				if (!numRe.test(raw[i])) return this.error(gettext('Not a number: '+raw[i]));

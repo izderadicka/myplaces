@@ -9,8 +9,8 @@ import unittest
 import os,re
 from myplaces import geocode
 from myplaces.models import Address
-from myplaces.implaces import UnicodeReader
 from django.contrib.gis.geos.point import Point
+import csv
 
 CSV_FILE=os.path.join(os.path.split(__file__)[0], './pivovary.csv')
 
@@ -124,7 +124,7 @@ class TestGeocode(unittest.TestCase):
         if NO<0:
             return
         with file(self.samples[NO][0], 'rb') as f:
-            reader=UnicodeReader(f)
+            reader=csv.reader(f, dialect=csv.excel)
             headers=reader.next()
             results=[]
             def fmt_loc(point):

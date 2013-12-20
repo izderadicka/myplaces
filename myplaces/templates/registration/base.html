@@ -1,8 +1,9 @@
 {%extends 'base.html'%}
+{% load utility_tags %}
 {%block body%}
 <section id="header">
 <div id="top_bar">
-<div><span id="logo">MyPlaces</span></div>
+<div><a href="{%full_url 'home'%}"><span id="logo">MyPlaces</span></a></div>
 </div>
 </section>
 <section id="main">

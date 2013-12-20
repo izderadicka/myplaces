@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<gpx version="1.1" creator="Locus Android"
+ xmlns="http://www.topografix.com/GPX/1/1"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd"
+ xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+ xmlns:gpxtrkx="http://www.garmin.com/xmlschemas/TrackStatsExtension/v1"
+ xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+ xmlns:locus="http://www.locusmap.eu">
+<wpt lat="49.982167" lon="14.364650">
+	<time>2011-09-23T15:48:42Z</time>
+	<name><![CDATA[u ondřeje]]></name>
+	<desc><![CDATA[zahrádka smíchov pohoda]]></desc>
+	<extensions>
+		<gpxx:WaypointExtension>
+			<gpxx:Address>
+				<gpxx:StreetAddress>Výpadová 215/9</gpxx:StreetAddress>
+				<gpxx:City>Prague 5</gpxx:City>
+				<gpxx:Country>Czech Republic</gpxx:Country>
+				<gpxx:PostalCode>153 00</gpxx:PostalCode>
+				<gpxx:State>Prague</gpxx:State>
+			</gpxx:Address>
+		</gpxx:WaypointExtension>
+	</extensions>
+</wpt>
+<wpt lat="50.002718" lon="14.354863">
+	<time>2013-09-14T12:34:46Z</time>
+	<name><![CDATA[Na Konci, restaurace]]></name>
+	<desc><![CDATA[prý dobra,  vyzkoušet]]></desc>
+	<link href="http://www.nakopci.com">
+	</link>
+	<sym>restaurant-restaurant</sym>
+	<extensions>
+		<locus:icon>restaurant-restaurant.png</locus:icon>
+		<gpxx:WaypointExtension>
+			<gpxx:Address>
+				<gpxx:StreetAddress>Ke Slivenci 36</gpxx:StreetAddress>
+				<gpxx:City>Praha-Lochkov</gpxx:City>
+				<gpxx:Country>Czech Republic</gpxx:Country>
+				<gpxx:State>Hlavní město Praha</gpxx:State>
+			</gpxx:Address>
+			<gpxx:PhoneNumber>+420702061564</gpxx:PhoneNumber>
+		</gpxx:WaypointExtension>
+	</extensions>
+</wpt>
+<wpt lat="49.889189" lon="14.315800">
+	<time>2013-09-14T12:48:03Z</time>
+	<name><![CDATA[Slowpec restaurant]]></name>
+	<sym>restaurant-restaurant</sym>
+	<extensions>
+		<locus:icon>restaurant-restaurant.png</locus:icon>
+		<gpxx:WaypointExtension>
+			<gpxx:Address>
+				<gpxx:StreetAddress>Líšnice 9</gpxx:StreetAddress>
+				<gpxx:City>Líšnice</gpxx:City>
+				<gpxx:Country>Czech Republic</gpxx:Country>
+				<gpxx:PostalCode>252 10</gpxx:PostalCode>
+				<gpxx:State>Central Bohemian Region</gpxx:State>
+			</gpxx:Address>
+		</gpxx:WaypointExtension>
+	</extensions>
+</wpt>
+<wpt lat="50.053047" lon="14.473403">
+	<time>2013-09-15T15:44:46Z</time>
+	<name><![CDATA[Strelnice sporilpv]]></name>
+	<sym>z-ico01</sym>
+	<extensions>
+		<locus:icon>z-ico01.png</locus:icon>
+	</extensions>
+</wpt>
+</gpx>

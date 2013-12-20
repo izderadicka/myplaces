@@ -100,29 +100,32 @@ body {
 }
 
 
-#main_menu_displayed > ul {
-    font-size: 1.5em;
-    list-style: none outside none;
-    padding-left: 0px;
-    margin: 0;
-}
-#main_menu_list li {
+
+.menu li {
     padding: 5px 10px;
 }
-#main_menu_list li:hover {
+.menu li:hover {
     background: #dddddd;
 }
-#main_menu_list li a {
+.menu li a {
     color: inherit;
     font-weight: bold;
     text-decoration: none;
     width: 100%;
     display:block;
 }
+
+.menu {
+		background: white;
+    border: 1px solid black;
+		font-size: 1.5em;
+    list-style: none outside none;
+    padding: 5px;
+    margin: 0;
+}
+
 #main_menu_displayed {
     position: absolute;
-    background: white;
-    border: 1px solid black;
     top: 45px;
     right: 10px;
 }
@@ -228,6 +231,16 @@ input.search {
     cursor:pointer;
 }
 
+#group_places h2 {
+    width: 80%;
+}
+
+#export_btn {
+    background: url("/static/mp/img/export.svg") no-repeat scroll 0 -4px rgba(0, 0, 0, 0);
+    background-size: 38px;
+    margin-right: 8px;
+    width: 38px;
+}
 
 div#footer_line {
     color:#808080;
@@ -537,7 +550,7 @@ form#import_start_form {
 }
 
 @media only screen and (max-width: 480px) {
-.r2b_form input:not([type="button"]), .r2b_form textarea, .r2b_ro_value {
+.r2b_form input:not([type="button"]):not([type="submit"]):not([type="checkbox"]), .r2b_form textarea, .r2b_ro_value {
 	 
     width: 85%;
     width: calc(100% - 46px);

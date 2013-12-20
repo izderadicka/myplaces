@@ -34,15 +34,12 @@ MyPlaces
 
 <form action="{%url 'auth_logout'%}" method="get">
 <span class="current_user">{{user}}</span>
-<input type="hidden" name="next" value="{%url 'home'%}">
+<input type="hidden" name="next" value="{%full_url 'home'%}">
 <input type="submit" value="{%trans 'Log Out'%}" id="logout-btn">
 </form>
 {%else%}
-<form id="login_form" action="{%full_url 'auth_login' 1%}" method="post">
- {% csrf_token %}
-<label for="id_username">{%trans 'Login:'%}</label><input type="text" name="username" id="id_username">
-<label for="id_password">{%trans 'Password:'%}</label><input type="password" name="password" id="id_password">
-<input type="hidden" name="next" value="{%url 'home'%}">
+<form id="login_form" action="{%url 'auth_login'%}" method="get">
+<input type="hidden" name="next" value="{%full_url 'home'%}">
 <input type="submit"  value="{%trans 'Log In'%}">
 </form>
 {%endif%}
@@ -96,6 +93,7 @@ MyPlaces
 
 <script type="text/template" id="group_places_detail">
 <div id="group_places">
+<div id="export_btn" class="small_btn"></div>
 <h2><%=name%></h2>
 <div class="search_bar">
 <input type="search" id="place_search_<%=id%>" class="search">
@@ -219,9 +217,9 @@ MyPlaces
 </script>
 
 <script type="text/template" id="main_menu" >
-<ul id="main_menu_list">
+<ul id="main_menu_list" class="menu">
 {% if not user.is_authenticated %}
-<li><a href="{%url 'auth_login'%}?next=%2Fmp">{%trans 'Login'%}</a></li>
+<li><a href="{%url 'auth_login'%}?next={%full_url 'home' encode=1%}">{%trans 'Log In'%}</a></li>
 <li><a href="{%url 'registration_register'%}">{%trans 'Register'%}</a></li>
 {%endif%}
 <li><a href="{%url 'home' %}">{%trans 'Reload'%}</a></li>
@@ -236,8 +234,16 @@ MyPlaces
 {% if user.is_authenticated %}
 <li><a href="{%url 'profile_change' %}">{%trans 'My Profile'%}</a></li>
 <li><a href="{% url 'auth_password_change'%}">{%trans 'Change Password'%}</a></li>
-<li><a href="{%url 'auth_logout'%}?next=%2Fmp">{%trans 'Logout'%}</a></li>
+<li><a href="{%url 'auth_logout'%}?next={%full_url 'home' encode=1%}">{%trans 'Log Out'%}</a></li>
 {%endif%}
+</ul>
+</script>
+
+<script type="text/template" id="export_menu">
+<ul id="export_menu_list" class="menu">
+{%for fmt in params.formats%}
+<li><a data-format="{{fmt.0}}" href="#do-the-needful">{{fmt.1}}</a></li> 
+{%endfor%}
 </ul>
 </script>
 

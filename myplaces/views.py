@@ -8,16 +8,15 @@ from django.views.generic.edit import UpdateView
 import logging
 from django.http import HttpResponse, HttpResponseBadRequest,\
     HttpResponseNotFound
-import sys
-import os
 import json
-from myplaces.models import PlacesGroup, Place
+from myplaces.models import PlacesGroup
 from myplaces.voronoi_util import voronoi_remote
 log=logging.getLogger('mp.views')
 import django_mobile
 import implaces
 import utils
 import remote
+import format
 
 
 def rr(request, template, ctx):
@@ -47,33 +46,37 @@ def _upload_places_2(request,step, form):
     form=form.cleaned_data
     form['csv_file']=tmp_file 
     group_exists=PlacesGroup.objects.filter(name=form['name']).count()
-    headers, max_lens, sample_lines=implaces.extact_headers(tmp_file)
-    return rr(request, 'upload2.html', {'headers':headers, 'max_lens': max_lens, 
-										'sample_lines':sample_lines, 'step':step,
-										'step_1':utils.serialize(form),
-                                        'stream_id': tmp_file,
-										'mappable_fields':implaces.get_mappable_fields(),
-                                        'values':{}, 
-                                        'group_exists':group_exists
-                                         })
+    ctx={'step':step,
+         'step_1':utils.serialize(form),
+        'stream_id': tmp_file,
+        'group_exists':group_exists}
+    addon=format.get_fmt_descriptor(form['file_format']).import_addon
+    template='upload2.html'
+    if addon:
+        addon().extend_context(tmp_file, ctx)
+        template=addon.template
+    return rr(request, template, ctx)
       
 def _upload_places_fin(request, step):
     form=utils.deserialize(request.POST.get('step_1'))
     existing=request.POST.get('update_type') or 'skip'
-    mapping, values, errors =implaces.extract_mapping(request.POST)
+    addon=format.get_fmt_descriptor(form['file_format']).import_addon
+    errors=None
+    extra_params=None
+    if addon:
+        extra_params, errors =addon().process_form(request.POST)
         
     if errors: 
         return rjson({'errors':errors})
-    tmp_file=form.get('csv_file')
-    del form['csv_file']
+    tmp_file=form.pop('csv_file')
     socket=None
     zmq_ctx=remote.context()
     try:
         socket=remote.create_socket(zmq_ctx, 'client', 0)
         try:
-            remote.call_remote(socket, 'import_places', [tmp_file, tmp_file, mapping, form.get('name'), 
+            remote.call_remote(socket, 'import_places', [tmp_file, tmp_file, extra_params, form.get('name'), 
                      form.get('description'), form.get('private'), 
-                     request.user, existing], call_id=form.get('call_id'))
+                     request.user, existing, form['file_format']], call_id=form.get('call_id') )
         except remote.RemoteError, e:
             return rjson({'errors':[_('Remote Error (%s)')% str(e)]})
     finally:
@@ -85,7 +88,6 @@ def _upload_places_fin(request, step):
     return rjson({})
 
 
-
 def group_geojson(request, group_id):
     try:
         group=PlacesGroup.objects.get(id=group_id)
@@ -95,19 +97,12 @@ def group_geojson(request, group_id):
     return HttpResponse(group.as_geojson(), mimetype='application/json')
 
 
-
-    
-
 def group_voronoi_geojson(request, group_id):
     json_data=voronoi_remote(group_id)
             
     return HttpResponse(json_data, mimetype='application/json')
 
-class ExtUpdateView(UpdateView):
-    #We would like to display same form - with 
-    def form_valid(self, form):
-        self.object = form.save(user=self.request.user)
-        return self.render_to_response(self.get_context_data(form=form, success=True))
+
     
     
 

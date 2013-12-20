@@ -10,6 +10,7 @@ from django import forms
 from models import  PlacesGroup, Place, Address
 from django.utils.translation import ugettext_lazy as _
 import os
+import format as fmt
 
 
 class AuditableModelForm(forms.ModelForm):
@@ -48,7 +49,7 @@ class Address(AuditableModelForm):
         model=Address
         
         
-        
+
 class ImportForm(Group):
     error_css_class = 'error'
     required_css_class = 'required'
@@ -58,15 +59,30 @@ class ImportForm(Group):
             self.user=kwargs.pop('user')
         super(ImportForm,self).__init__(*args,**kwargs)
         
-
-    csv_file=forms.FileField(label=_('CSV File'), required=True)
+    file_format=forms.ChoiceField(label=_('File Format'), choices=fmt.index())
+    csv_file=forms.FileField(label=_('File To Import'), required=True)
     call_id=forms.CharField(required=True, widget=forms.HiddenInput(), label='')
     description=forms.CharField(widget=forms.Textarea, required=False)
-    def clean_csv_file(self):
-        ext=os.path.splitext(self.cleaned_data['csv_file'].name)[1]
-        if ext.lower()!='.csv':
-            raise forms.ValidationError(_('Only .csv files can be imported'))
-        return self.cleaned_data['csv_file']
+    def clean(self):
+        fname=self.cleaned_data.get('csv_file')
+        fname= fname.name if fname else ''
+        ext=os.path.splitext(fname)[1]
+        allowed_exts=fmt.get_fmt_descriptor(self.cleaned_data['file_format']).extensions
+        
+        if ext and allowed_exts:
+            ext=ext[1:]
+            if allowed_exts:
+                ext=ext.lower()
+                if not ext in allowed_exts:
+                    raise forms.ValidationError(_('Invalid file extension for %s format')%
+                                                self.cleaned_data['file_format'])
+            else:
+                raise forms.ValidationError(_('Missing file extension for %s format')%
+                                                self.cleaned_data['file_format'])
+                
+            
+            
+        return self.cleaned_data
     
     def clean_name(self):
         name=self.cleaned_data['name']
