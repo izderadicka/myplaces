@@ -5,13 +5,21 @@
 {% trans 'Map' %}
 {%endblock%}
 {%block head_script%}
-<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.css"/>
-<script type="text/javascript" src="{{STATIC_URL}}js/Leaflet/leaflet.js"></script>
-<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.ie.css" /><![endif]-->
-<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster/MarkerCluster.css" />
-<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.css" />
-<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.ie.css" /><![endif]-->
-<script src="{{STATIC_URL}}js/Leaflet.markercluster/leaflet.markercluster.js"></script>
+{%if debug%}
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet-0.7.1/leaflet.css"/>
+<script type="text/javascript" src="{{STATIC_URL}}js/Leaflet-0.7.1/leaflet-src.js"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster-0.4/MarkerCluster.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster-0.4/MarkerCluster.Default.css" />
+<script src="{{STATIC_URL}}js/Leaflet.markercluster-0.4/leaflet.markercluster-src.js"></script>
+
+{%else%}
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js?2"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster-0.4/MarkerCluster.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster-0.4/MarkerCluster.Default.css" />
+<script src="{{STATIC_URL}}js/Leaflet.markercluster-0.4/leaflet.markercluster.js"></script>
+{%endif%}
+
 <script src="{{STATIC_URL}}/mp/js/map.js"></script>
 <link rel="stylesheet" href="{{STATIC_URL}}mp/css/map.css">
 

@@ -16,9 +16,15 @@ body {
 }
 
 #main {
-	  height: 90%;
-    height: calc(100% - 98px);
     clear:both;
+    height: 90%;
+  	height: calc(100% - 98px);
+}
+
+#main.mobile {
+		height: auto;
+		min-height: 80%;
+  	min-height: calc(100% - 101px);
 }
 
 #content {
@@ -246,9 +252,16 @@ div#footer_line {
     color:#808080;
     margin: 10px auto 5px;
     text-align: center;
-    width: 600px;
+    clear:both;
    
 }
+
+div#footer_line.mobile {
+	border-top: 1px solid lightgray;
+	padding-top: 5px;
+	font-size: 120%;
+}
+
 
 
 #footer_line > ul {
@@ -266,6 +279,13 @@ div#footer_line {
     padding-right: 5px;
     border-right: solid 2px lightgray;
 }
+
+#footer_line.mobile > ul li {
+	padding-top: 5px;
+	border-right: none;
+  display: block;
+}
+
 #footer_line > ul li:last-child {
     border-right: none;
 }
@@ -307,7 +327,7 @@ table#import_table tr.line {
 ul.list {
     
     list-style: none outside none;
-    margin: 15px 10px;
+    margin: 15px 10px 10px 10px;
     padding: 0;
 }
 
@@ -340,7 +360,7 @@ ul.list li {
     display: block;
     float: left;
     font-size: 1.3em;
-    margin: 5px 15px;
+    margin: 0px 15px 5px 15px;
     padding: 3px 6px;
 }
 

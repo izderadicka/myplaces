@@ -516,6 +516,8 @@ var myPlacesApp=(function() {
 	var showStatic= function(page) {
 		if (fullSite) {
 			router.listGroups();
+		} else {
+			window.scroll(0,0);
 		}
 		$(rightPanel).load(staticPrefix+page);
 	};

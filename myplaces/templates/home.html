@@ -3,22 +3,31 @@
 {% load i18n %} 
 {% load utility_tags %}
 {%block title%}
-MyPlaces
+MyPlaces - {%trans 'free tool to map and share interesting places on Earth'%}
 {%endblock%}
 {%block head_script%}
-
-<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.css"/>
-<script type="text/javascript" src="{{STATIC_URL}}js/Leaflet/leaflet.js"></script>
-<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet/leaflet.ie.css" /><![endif]-->
-<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster/MarkerCluster.css" />
-<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.css" />
-<!--[if lte IE 8]><link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster/MarkerCluster.Default.ie.css" /><![endif]-->
-<script src="{{STATIC_URL}}js/Leaflet.markercluster/leaflet.markercluster.js"></script>
-<script src="{{STATIC_URL}}/mp/js/map.js"></script>
-<link rel="stylesheet" href="{{STATIC_URL}}mp/css/map.css">
-
+<meta name="description" content="{%trans 'Myplaces is a service, where you define your collections of places (POIs) on map. It Offers easy ways how to create, maitain, export  and present such collections.'%}"/>
+<meta name="keywords" content="{%trans 'POI, GPX, Map, OpenStreetMaps, Free, GIS, GPS'%}"/>
+{%if debug%}
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet-0.7.1/leaflet.css"/>
+<script type="text/javascript" src="{{STATIC_URL}}js/Leaflet-0.7.1/leaflet-src.js"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster-0.4/MarkerCluster.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster-0.4/MarkerCluster.Default.css" />
+<script src="{{STATIC_URL}}js/Leaflet.markercluster-0.4/leaflet.markercluster-src.js"></script>
 <script  src="{{STATIC_URL}}js/underscore-min.js"></script>
 <script  src="{{STATIC_URL}}js/backbone-min.js"></script>
+{%else%}
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js?2"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster-0.4/MarkerCluster.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster-0.4/MarkerCluster.Default.css" />
+<script src="{{STATIC_URL}}js/Leaflet.markercluster-0.4/leaflet.markercluster.js"></script>
+<script  src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+<script  src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+{%endif%}
+
+<script src="{{STATIC_URL}}/mp/js/map.js"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}mp/css/map.css">
 <script  src="{%url 'js-api'%}"></script>
 <script src="{{STATIC_URL}}js/api-forms.js"></script>
 <script  src="{{STATIC_URL}}mp/js/app.js"></script>
@@ -49,19 +58,29 @@ MyPlaces
 </div>
 </section>
 
-<section id="main">
+<section id="main"{%if flavour == 'mobile'%} class="mobile"{%endif%}>
 <div id="content">
 {%if flavour == 'full' %}
 <div id="left_panel"></div>
-<div id="right_panel"></div>
+<div id="right_panel">
+{%blocktrans%}
+<h2 class="info">MyPlaces is free service for creating own collections of points on maps.</h2>
+<h2 class="info">Collection points / places are basically you custom maps.</h2>
+<h2 class="info">Maps used are from OpenStreetMap project</h2>
+<h2 class="info">Offers various export and import possibilities  - formats CSV, GPX, GeoJSON</h2>
+<h2 class="info">Data can be this exchanged with navigation devices and GPS</h2>
+<h2 class="info">Also provides some nice visualizations on the map - like clustering of points or Voronoi diagrams</h2>
+<h2 class="info">Service is free and open source anyone can join or contribute </h2>
+{%endblocktrans%}
+</div>
 {%else%}
 <div id="one_panel"></div>
 {%endif%}
 </div>
 </section>
-{%if flavour == 'full'%}
+
 <section id="footer">
-<div id="footer_line">
+<div id="footer_line"{%if flavour == 'mobile'%} class="mobile"{%endif%}>
 <ul>
 
 <li><a href="#about">{%trans 'About'%}</a></li>
@@ -72,7 +91,7 @@ MyPlaces
 </div>
 </div>
 </section>
-{%endif%}
+
 </div>
 
 {{params.forms.render_all}}
