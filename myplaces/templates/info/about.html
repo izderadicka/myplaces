@@ -15,20 +15,20 @@ MyPlaces site is using responsible page design so it can be accessed from modern
 same interface, but optimized for smaller screens.
 <li>
 <li><span class="small_title">Openness</span><br>
-MyPlaces is fully based on open source technologies. 
+MyPlaces is fully based on Open Source technologies. 
 Sources for itself are <a href="https://github.com/izderadicka/myplaces">available on github.</a><br>
-Also used maps are from fantastic <a href="">OpenStreetMap</a> open project.
+Also used maps are from fantastic <a href="http://www.openstreetmap.org">OpenStreetMap</a> project.
 </li>
 <li><span class="small_title">Passion</span><br>
 I like maps.   I like to browse them,   see their various features etc.   That's why I've learned a bit about GIS 
 and current map technologies on Internet.  This site is partially my playground for these technologies and 
-partially  place to see collections of places in an easy way. 
+partially place to see collections of places in an easy way. 
 </li>
 <li><span class="small_title">Extra</span><br>
 We would like to provide something extra,  which is not very common in similar services either in 
-areas of geographic data visualization or functionality.     As per now we can offerer interesting visualization - 
+areas of geographic data visualization and functionality.     As per now we can offerer an interesting visualization - 
 <a href="http://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> of places in a collection, or 
-flexible import functionality, where collection can be imported from existing spreadsheet (CSV format).
+flexible import functionality, where a collection can be imported from several formats (CSV, GPX, GeoJSON).
 I hope we will be able to provide more in future.
 </li>
 </ul>
@@ -36,20 +36,21 @@ I hope we will be able to provide more in future.
 
 <h3>{%trans 'Premium Features'%}</h3>
 {%blocktrans%}
-Few features of this service are set as premium and available only to users, who contributed to this project, 
+Few features of this service are set as a premium and available only to users, who contributed to this project, 
 as a mean of appreciation for their support.<br> 
-You can  contribute to either development, content or also by a small donation - for details about how to 
+You can  contribute to either development, content of the service or also by a small donation - for details about how to 
 contribute go <a href="#contribute">here</a>.
+Premium features now include higher limits on size of places collection and number of collections per user.
 {%endblocktrans%}
 
 <h3>{% trans 'Technology'%}</h3>
 {%blocktrans%}
-Service is build in Python programing language,  using django (and geodjango support various geographic operations).  
+The service is build in Python programming language,  using Django (and GeoDjango support various geographic operations).  
 Python code is running in gevent webserver (with support for websockets and socket.io protocols) as a backend 
 service behind nginx webserver, which provides static data,  load balancing to backends and caching.<br>
 Backend uses Postgres database to store and manipulate data and PostGIS extension to this database. <br>
 Application is designed (mostly) as a single page application leveraging RESTful services on backend servers
-(with help of django-rest-framework) and backbone.js and jquery javasript libraries on client side to provide 
+(with help of django-rest-framework) and backbone.js and jQuery Javasript libraries on client side to provide 
 dynamic interface.
 {%endblocktrans%}
 
@@ -61,7 +62,7 @@ For details go the <a href="https://github.com/izderadicka/myplaces">source code
 </p>
 
 <p>
-Special attribution to authors in The Noun Project - I used many of their nice icons/symbols in user interface.   
+Special attribution to authors in <a href="http://thenounproject.com">The Noun Project</a> - I some of their nice icons/symbols in user interface.   
 (I did not collect names as required for proper CC attribution, sorry 
 if somebody feels offended let me know I'll fix)
 </p>
