@@ -5,7 +5,7 @@ It's based on django, geo-django, postgis and uses OpenStreetMap data and servic
 Prerequisities
 ==============
 Scrips below are for ubuntu 12.04+/Debian - do not forget to upgrade your install to latest version - apt-get update; apt-get dist-upgrade
-
+Scripts shall be run under root (if logged in under other user use sudo)
 SMTP server to send email
 You can start one (lightweight, send only) on your server as per instructions https://library.linode.com/email/exim/send-only-mta-ubuntu-12.04-precise-pangolin
  
@@ -19,6 +19,7 @@ You can start one (lightweight, send only) on your server as per instructions ht
 
  #nginx - we will need relativelly recent version for websocket support
  apt-get install -y python-software-properties
+ apt-get install -y python-dev
  add-apt-repository ppa:nginx/stable
  apt-get update
  apt-get install -y nginx-light
@@ -32,7 +33,7 @@ You can start one (lightweight, send only) on your server as per instructions ht
  #numpy and matplotlib would be quicker from distro packages
  apt-get install -y python-numpy python-matplotlib
  #postgres database 9.1+ recommended, python driver, postgis
- apt-get install -y postgresql python-psycopg2 postgis
+ apt-get install -y postgresql python-psycopg2 postgresql-9.1-postgis postgresql-contrib-9.1
 
  apt-get install -y git
 
@@ -51,16 +52,31 @@ You can start one (lightweight, send only) on your server as per instructions ht
   make install
   ldconfig
 
-
-
-
-
-
 Install:
 ========
 ```
- # debian/ubuntu 
- sudo pip -r requirements.pip
+Creating DB - switch to postgres user
+ su postgres
+ createuser -PRSd maps
+ createdb -O maps -e maps
+ psql -a -c "CREATE EXTENSION unaccent;"   maps
+ psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+ psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+ psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis_comments.sql
+ #template_postgis is only needed for running tests
+ createdb -T maps template_postgis
+ psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';"
+
+ #getcode from github
+ cd /opt
+ git clone https://github.com/izderadicka/myplaces.git maps
+ cd maps
+ 
+
+
+ # install dependencies
+ pip -r requirements.pip
+
  
 
 

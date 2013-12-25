@@ -101,8 +101,6 @@ class GPXFileReader(FileReader):
 class GpxExporter(ExportAdapter):
     def export(self, group, places):
         def qname(prefix, name):
-            if XML_PARSER=='lxml' and prefix=='gpx':
-                return name
             return ElementTree.QName(NS[prefix], name)
         root_args={}
         nsmap={None: NS['gpx'], 
@@ -113,8 +111,8 @@ class GpxExporter(ExportAdapter):
             root_args['nsmap']=nsmap
         
         root=ElementTree.Element(qname('gpx','gpx'), {
-                qname('gpx','version'):'1.1', 
-                qname('gpx','creator'):'MyPlaces',
+                'version':'1.1', 
+                'creator':'MyPlaces',
                 ElementTree.QName(nsmap['xsi'], 'schemaLocation'): 'http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensions/v3/GpxExtensionsv3.xsd',
                 },
                 **root_args)
@@ -125,13 +123,13 @@ class GpxExporter(ExportAdapter):
             ElementTree.SubElement(meta, qname('gpx', 'desc')).text=group.description
         for place in places:
             wpt=ElementTree.SubElement(root, qname('gpx', 'wpt'), 
-                {qname('gpx', 'lon'): str(place.position.x),
-                 qname('gpx', 'lat'): str(place.position.y)})
+                {'lon': str(place.position.x),
+                 'lat': str(place.position.y)})
             ElementTree.SubElement(wpt, qname('gpx', 'name')).text=place.name
             if place.description:
                 ElementTree.SubElement(wpt, qname('gpx', 'desc')).text=place.description
             if place.url:
-                ElementTree.SubElement(wpt, qname('gpx', 'link'), {qname('gpx', 'href'):place.url})
+                ElementTree.SubElement(wpt, qname('gpx', 'link'), {'href':place.url})
             if place.address:
                 ext=ElementTree.SubElement(wpt, qname('gpx', 'extensions'))
                 ext=ElementTree.SubElement(ext, qname('ext', 'WaypointExtension'))

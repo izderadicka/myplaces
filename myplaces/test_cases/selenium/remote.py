@@ -23,7 +23,7 @@ log=logging.getLogger('mp.remote')
 
 
 ADDR='tcp://127.0.0.1:9999'
-ADDR_SUB='ipc://test_workers'
+ADDR_SUB='ipc:///tmp/test_workers'
 ADDR_PUB='tcp://127.0.0.1:9998' 
 
 _REMOTE_METHODS={}

@@ -149,7 +149,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    'django.contrib.admin',
+#    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'django.contrib.gis',
@@ -179,7 +179,7 @@ REST_FRAMEWORK = {
 
 #remote workers
 REMOTE_ADDR_IMPORT='tcp://127.0.0.1:9999'
-REMOTE_ADDR_IMPORT_PROXY='ipc://test_workers'
+REMOTE_ADDR_IMPORT_PROXY='ipc:///tmp/test_workers'
 REMOTE_ADDR_IMPORT_BROADCAST='tcp://127.0.0.1:9998' 
 
 REMOTE_ADDR_GEOCODE='tcp://127.0.0.1:10009' 
