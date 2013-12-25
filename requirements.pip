@@ -1,4 +1,4 @@
-Django>=1.4.5
+Django>=1.4.5,<1.6
 djangorestframework>=2.3.8
 beautifulsoup4>=4.2.1
 django-filter>=0.7
@@ -12,3 +12,4 @@ gevent_psycopg2>=0.0.3
 django-lockout>=0.1.1
 lxml>=3.1.0
 gevent-socketio>=0.3.5-rc2
+geopy>=0.95.1
