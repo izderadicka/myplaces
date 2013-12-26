@@ -75,8 +75,9 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options ):
         if options.get('debug'):
+            logging.basicConfig(level=logging.DEBUG)
             logging.getLogger().setLevel(logging.DEBUG)
-            logging.basicConfig(logging.DEBUG)
+            
             
         remote.init()
         ctx=remote.context(True)
