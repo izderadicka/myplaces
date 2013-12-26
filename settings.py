@@ -197,9 +197,6 @@ CAPTCHA_FLITE_PATH=None#'/usr/bin/flite'
 #proxy settings - disable if not behind reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
@@ -214,7 +211,9 @@ LOGGING = {
         '()': 'django.utils.log.RequireDebugFalse'
         }
     },
-           
+           # A sample logging configuration. The only tangible logging
+# performed by this configuration is to send an email to
+# the site admins on every HTTP 500 error.
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
@@ -222,7 +221,7 @@ LOGGING = {
             'filters': ['require_debug_false'],
         },
          'console':{
-            'level':'WARN',
+            'level':'DEBUG',
             'class':'logging.StreamHandler',
             'formatter': 'simple'
         },

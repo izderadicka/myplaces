@@ -51,7 +51,7 @@ class CoderMixin(object):
         address=self.address_to_string(adr)
         while True:
             try:
-                places=super(CoderMixin, self).geocode(address, exactly_one=False)
+                places=super(CoderMixin, self).geocode(address.encode('utf-8'), exactly_one=False)
                 break
             except NotFound:
                 
