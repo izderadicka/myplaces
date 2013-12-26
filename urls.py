@@ -7,7 +7,7 @@ import myplaces.remote as remote
 from django.conf import settings
 from django.views.generic import RedirectView
 from account import AuthenticationLockForm
-import socketio.sdjango
+from  socketio_app import sdjango
 
 
 #patch site login form
@@ -17,7 +17,7 @@ admin.autodiscover()
 
 #Init zmq for remote calls 
 remote.init(hasattr(settings,'USE_GEVENT') and settings.USE_GEVENT)
-socketio.sdjango.autodiscover()
+sdjango.autodiscover()
 
 
 urlpatterns = patterns('',
@@ -32,7 +32,7 @@ urlpatterns = patterns('',
     url(r'^/?$', RedirectView.as_view(url='/mp/')),
     url(r'^admin/', include(admin.site.urls)),
     # This one enables site wise websocket 
-    url("^socket\.io", include(socketio.sdjango.urls)),
+    url("^socket\.io", include(sdjango.urls)),
     # this is js local strings catalogue
     url(r'^js-locale/(?P<packages>\S+?)/?$', 'django.views.i18n.javascript_catalog'),
     url(r'^mp/', include(myplaces.urls)),

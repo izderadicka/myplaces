@@ -6,7 +6,7 @@ Created on Jun 18, 2013
 
 from socketio.namespace import BaseNamespace
 from socketio.mixins import RoomsMixin, BroadcastMixin
-from socketio.sdjango import namespace
+from socketio_app.sdjango import namespace
 import remote
 
 import logging
