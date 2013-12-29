@@ -71,13 +71,19 @@ class ImportThread(Thread):
         
 class Command(BaseCommand):
     option_list=BaseCommand.option_list + \
-    (make_option("-d", "--debug",  help="Switch on debug messaging" , action="store_true"),)
+    (make_option("-d", "--debug",  help="Switch on debug messaging" , action="store_true"),
+     make_option("--test", help="Connects to test database", action="store_true"))
     
     def handle(self, *args, **options ):
         if options.get('debug'):
             logging.basicConfig(level=logging.DEBUG)
             logging.getLogger().setLevel(logging.DEBUG)
+        if options.get('test') :
+            from django.db import connections, DEFAULT_DB_ALIAS
+            conn=connections[DEFAULT_DB_ALIAS]
+            conn.settings_dict['NAME'] = 'test_'+conn.settings_dict['NAME']
             
+               
             
         remote.init()
         ctx=remote.context(True)

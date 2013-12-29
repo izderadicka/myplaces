@@ -12,8 +12,9 @@ import subprocess
 import os
 from myplaces import remote
 import numpy
+from myplaces.models import PlacesGroup
 
-class TestVoronoi(test.TestCase):
+class TestVoronoi(unittest.TestCase):
 
 
     def test_shift(self):
@@ -54,15 +55,16 @@ class TestVoronoi(test.TestCase):
         self.assertTrue(centers[0,0]==0 and centers[0,1]==0 and centers[1,0]==0 and centers[1,1]==0)
 
 
-import myplaces.views  as views          
-class TestVoronoiGeojson(test.TestCase):
-    fixtures=["test_data_auth.json", "test_data.json", ]
+import myplaces.views  as views 
+from django.db import transaction         
+class TestVoronoiGeojson(test.TransactionTestCase):
+    fixtures=[ "test_data_auth.json", "test_data.json",]
     
     def setUp(self):
         remote.init()
         manage=os.path.join(os.path.split(__file__)[0], '../../manage.py')
-        self.p=subprocess.Popen(['python', manage,  'process_server'], shell=False)
-      
+        self.p=subprocess.Popen(['python', manage,  'process_server', '--test'], shell=False)
+        #transaction.commit()
     def tearDown(self):
         self.p.kill()
     
