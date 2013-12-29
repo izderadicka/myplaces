@@ -37,6 +37,8 @@ You can start one (lightweight, send only) on your server as per instructions ht
 
  apt-get install -y git
 
+ apt-get install gdal-bin
+
  #create user to run python backend
  adduser ivan
  usermod -G postgres,www-data -a ivan

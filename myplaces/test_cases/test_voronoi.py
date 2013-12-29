@@ -13,7 +13,7 @@ import os
 from myplaces import remote
 import numpy
 
-class TestVoronoi(unittest.TestCase):
+class TestVoronoi(test.TestCase):
 
 
     def test_shift(self):
