@@ -1,6 +1,6 @@
 {%extends 'registration/base.html'%}
 {% load i18n %} 
-{% load url from future %}
+{% load utility_tags %}
 {%block title%}
 {% trans 'Registration Complete' %}
 {%endblock%}
@@ -12,7 +12,7 @@ Your registration is now send.
 You will receive an email in a minute, with instructions how to complete your registration.
 <br>
 In a meanwhile you can still {%endblocktrans%}
-<a href="{%url 'home'%}">{%trans 'use our site'%}</a>
+<a href="{%full_url 'home'%}">{%trans 'use our site'%}</a>
 {%blocktrans%} as unregistered user.
 {%endblocktrans%}
 </p>

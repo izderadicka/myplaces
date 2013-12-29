@@ -1,6 +1,6 @@
 {%extends 'registration/base.html'%}
 {% load i18n %} 
-{% load url from future %}
+{% load utility_tags %}
 {%block title%}
 {% trans 'Password Reset Required' %}
 {%endblock%}
@@ -12,7 +12,7 @@ We've e-mailed you instructions for resetting your password to
 the e-mail address you submitted. You should be receiving it shortly.
 <br>
 You can return to {%endblocktrans%}
-<a href="{%url 'home'%}">{%trans 'home page'%}</a>
+<a href="{%full_url 'home'%}">{%trans 'home page'%}</a>
 .
 </p>
 

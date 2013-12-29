@@ -42,15 +42,16 @@ You can start one (lightweight, send only) on your server as per instructions ht
  usermod -G postgres,www-data -a ivan
 
  #assure you have libzmq >= 3.2.3, may install it from source (ubuntu 13.04 has 2.2) - http://zeromq.org/intro:get-the-software
+ #may not be needed
  apt-get install -y  libtool  autoconf  automake
  apt-get install -y  uuid-dev
-  wget http://download.zeromq.org/zeromq-3.2.4.tar.gz
-  tar xvzf zeromq-3.2.4.tar.gz 
-  cd zeromq-3.2.4/
-  ./configure
-  make
-  make install
-  ldconfig
+ wget http://download.zeromq.org/zeromq-3.2.4.tar.gz
+ tar xvzf zeromq-3.2.4.tar.gz 
+ cd zeromq-3.2.4/
+ ./configure
+ make
+ make install
+ ldconfig
 
 Install:
 ========
@@ -66,7 +67,9 @@ Creating DB - switch to postgres user
  #template_postgis is only needed for running tests
  createdb -T maps template_postgis
  psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';"
+ exit
 
+Now can install the code
  #getcode from github
  cd /opt
  git clone https://github.com/izderadicka/myplaces.git maps

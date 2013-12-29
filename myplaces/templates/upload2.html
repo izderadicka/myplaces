@@ -103,6 +103,13 @@ function closePage() {
  {% csrf_token %}
  
 {%block format_specific%}
+{%if not group_exist%}
+<script>
+$(function() {
+	$('#submit_btn').click();
+});
+</script>
+{%endif%}
 {%endblock%}
 
 {%if group_exists%}
@@ -114,12 +121,6 @@ function closePage() {
 <option value="remove">{%trans 'Remove all existing places within group and import new'%}</option>
 </select>
 </div>
-{%else%}
-<script>
-$(function() {
-	$('#submit_btn').click();
-});
-</script>
 {%endif%}
 <input type="button" value="Import" onclick="submitForm()" id='submit_btn'/>
 </form>
@@ -131,4 +132,5 @@ $(function() {
 </div></div>
 <ul id='messages'  class="r2b_errors"></ul>
 </div>
+
 {%endblock%}

@@ -14,8 +14,8 @@ MyPlaces - {%trans 'free tool to map and share interesting places on Earth'%}
 <link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster-0.4/MarkerCluster.css" />
 <link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster-0.4/MarkerCluster.Default.css" />
 <script src="{{STATIC_URL}}js/Leaflet.markercluster-0.4/leaflet.markercluster-src.js"></script>
-<script  src="{{STATIC_URL}}js/underscore-min.js"></script>
-<script  src="{{STATIC_URL}}js/backbone-min.js"></script>
+<script  src="{{STATIC_URL}}js/underscore.js"></script>
+<script  src="{{STATIC_URL}}js/backbone.js"></script>
 {%else%}
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
 <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js?2"></script>
@@ -94,7 +94,11 @@ MyPlaces - {%trans 'free tool to map and share interesting places on Earth'%}
 
 </div>
 
+{%if params%}
 {{params.forms.render_all}}
+{%else%}
+{{forms.render_all}}
+{%endif%}
 
 
 <script type="text/template" id="form_template">
@@ -261,6 +265,9 @@ MyPlaces - {%trans 'free tool to map and share interesting places on Earth'%}
 <script type="text/template" id="export_menu">
 <ul id="export_menu_list" class="menu">
 {%for fmt in params.formats%}
+<li><a data-format="{{fmt.0}}" href="#do-the-needful">{{fmt.1}}</a></li> 
+{%endfor%}
+{%for fmt in formats%}
 <li><a data-format="{{fmt.0}}" href="#do-the-needful">{{fmt.1}}</a></li> 
 {%endfor%}
 </ul>

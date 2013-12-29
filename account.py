@@ -156,7 +156,7 @@ class AuthenticationLockForm(AuthenticationForm, LabelCssMixin):
                 raise ValidationError(_('Login is temporarily disabled due to high amount of unsuccessful attempts from your address - try again later'))
             if self.user_cache is None:
                 raise forms.ValidationError(
-                    self.error_messages['invalid_login'])
+                    self.error_messages['invalid_login']% {'username': self.username_field.verbose_name})
             elif not self.user_cache.is_active:
                 raise forms.ValidationError(self.error_messages['inactive'])
         self.check_for_test_cookie()

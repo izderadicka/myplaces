@@ -3,7 +3,6 @@
 	<name>mapy</name>
 	<comment></comment>
 	<projects>
-		<project>rest2backbone</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

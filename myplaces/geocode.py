@@ -15,7 +15,7 @@ log=logging.getLogger('mp.geocode')
 import re
 import json
 from geopy import geocoders, util 
-from geopy.geocoders.base import GeocoderError
+from geopy.exc import GeopyError as GeocoderError
 from django.contrib.gis.geos import Point
 from models import Address
 from django.conf import settings
@@ -149,7 +149,7 @@ class NominatimAddressAdapter(object):
 class OSMNominatim(CoderMixin, geocoders.OpenMapQuest):
     def __init__(self, format_string='%s'):
         super(OSMNominatim, self).__init__(format_string=format_string)
-        self.url='http://nominatim.openstreetmap.org/search.php?format=json&addressdetails=1&%s'
+        self.api='http://nominatim.openstreetmap.org/search.php?format=json&addressdetails=1&%s'
     
     def address_to_string(self,adr): 
         if isinstance(adr, Address):
@@ -163,18 +163,14 @@ class OSMNominatim(CoderMixin, geocoders.OpenMapQuest):
                 raise ValueError('Empty address')   
         return string
     
-    def parse_json(self, page, exactly_one=True):
+    def _parse_json(self, resources, exactly_one=True):
         """Parse address, latitude, and longitude from an JSON response."""
-        if not isinstance(page, basestring):
-            page = util.decode_page(page)
-        resources = json.loads(page)
-        
+                
         if not resources:
             raise NotFound()
         
         if exactly_one and len(resources)!=1:
             raise ValueError('Found more then one places')
-        
         
         if exactly_one:
             return self._parse_resource(resources[0])
@@ -209,19 +205,14 @@ class Google(CoderMixin, geocoders.GoogleV3):
         super(Google,self).__init__(*args, **kwargs)
         
     
-    def parse_json(self, page, exactly_one=True):
-        if not isinstance(page, basestring):
-            page = util.decode_page(page)
-        self.doc = json.loads(page)
-        #print self.doc
-        places = self.doc.get('results', [])
-    
-        if not places:
+    def _parse_json(self, page, exactly_one=True):
+        
+        places = page.get('results', [])
+        if not len(places):
             try:
-                geocoders.googlev3.check_status(self.doc.get('status'))
+                self._check_status(page.get('status'))
             except GeocoderError, e:
                 log.info('Google error - %s', e)
-        
             raise NotFound()
         
         elif exactly_one and len(places) != 1:

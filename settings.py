@@ -7,13 +7,19 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 INTERNAL_IPS= ('127.0.0.1',)
 ADMINS = (
-     ('Ivan', 'ivan@zderadicka.eu'),
+     ('Ivan', 'admin@my-places.eu'),
 )
 
 
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST='localhost'
+    EMAIL_PORT=25
+
+DEFAULT_FROM_EMAIL = 'registration@my-places.eu'
 
 MANAGERS = ADMINS
 
@@ -149,13 +155,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-#    'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'django.contrib.gis',
     'myplaces',
     'tagging',
-    'debug_toolbar', # remove if not using debug_toolbar
+#    'debug_toolbar', # remove if not using debug_toolbar
     'socketio_app',
     'rest_framework',
     'django_mobile',

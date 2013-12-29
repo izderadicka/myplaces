@@ -1,6 +1,4 @@
 eclipse.preferences.version=1
-encoding//django_mobile/__init__.py=utf-8
-encoding//django_mobile/conf.py=utf-8
 encoding//gpx/gpx.py=utf-8
 encoding//grabber/pivovary.py=utf-8
 encoding//grabber/unetice.py=utf-8
@@ -15,4 +13,6 @@ encoding//myplaces/test_cases/test_imports2.py=utf-8
 encoding//myplaces/test_cases/test_models.py=utf-8
 encoding//myplaces/test_cases/test_views.py=utf-8
 encoding//myplaces/tests.py=utf-8
-encoding//rest_framework/test.py=utf-8
+encoding//old-libs/django_mobile/__init__.py=utf-8
+encoding//old-libs/django_mobile/conf.py=utf-8
+encoding//old-libs/rest_framework/test.py=utf-8
