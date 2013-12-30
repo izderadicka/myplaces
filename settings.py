@@ -209,8 +209,12 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters': {'simple': {
-            'format': '%(levelname)s:%(name)s:%(message)s'
-        }},
+            'format': '%(levelname)s:%(name)s:%(message)s',
+            },
+            'with_date': {
+                'format': '%(asctime)s:%(levelname)s:%(name)s:%(message)s',
+                }
+                   },
            
     'filters': {
         'require_debug_false': {
@@ -231,24 +235,42 @@ LOGGING = {
             'class':'logging.StreamHandler',
             'formatter': 'simple'
         },
+                 
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'with_date',
+            'filename': '/home/ivan/workspace/mapy/logs/log.txt', #'/var/log/myplaces/log.txt',
+            'maxBytes': 10485760,
+            'backupCount':3,
+        },
     },
     'loggers': {
-#         'django.request': {
-#             'handlers': ['mail_admins'],
-#             'level': 'ERROR',
-#             'propagate': True,
-#         },
+         'django.request': {
+             'handlers': ['mail_admins'],
+             'level': 'ERROR',
+             'propagate': True,
+         },
+                
+#      'django' : {
+#                  'handlers':['console',],
+#           'level':'WARN',
+#           'propagate': False
+#                  },
 
-    'mp':{'handlers':['console',],
-          'level':'WARN'
-          },
+#     'mp':{'handlers':['console',],
+#           'level':'WARN',
+#           'propagate': True,
+#           }
+                
+    },
     
            
-    'rest_framework':{'handlers':['console',],
-          'level':'WARN'
-          }
-    
-}}
+ 'root':{'handlers':['file',],
+        'level':'WARN',
+          
+          }  
+}
 
 CACHES = {
     'default': {

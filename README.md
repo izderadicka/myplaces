@@ -76,15 +76,52 @@ Now can install the code
  cd /opt
  git clone https://github.com/izderadicka/myplaces.git maps
  cd maps
- 
 
+ #create directory for static data
+ mkdir /var/www
+ chown root:www-data /var/www
+ ls -la /var
+ chmod g+w /var/www
+ 
+ #create ssl certificate and pk
+ mkdir /etc/nginx/ssl
+ # get certificate from startssl - guide is here http://www.lognormal.com/blog/2013/06/22/setting-up-ssl-on-nginx/
+ 
+ #configure nginx
+ mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.old
+ cp deploy/nginx/nginx.conf /etc/nginx/
+ cp deploy/nginx/sites-available/* /etc/nginx/sites-available/
+ /etc/init.d/nginx reload
+ #tail /var/log/nginx/error.log
+
+ #create dir for logs
+ mkdir /var/log/myplace
+ chown ivan:www-data /var/log/myplaces
 
  # install dependencies
  pip -r requirements.pip
 
+
+ #optionally run tests
+ su ivan
+ ./manage.py test myplaces
+
+ #create db, admin account and load initial groups
+ ./manage.py syncdb
+ ./manage.py loaddata myplaces/fixtures/default_groups.json
+
+ #collect static data
+ ./manage.py collectstatic
+
+edit settings.py
+- change DEBUG to False !!!
+- set log location (file log handled in LOGGING)
+- plus modify any other settings as appropriate (email address etc.)
  
+ 
+start browser - go to site url
 
-
+login to /admin - change site name to appropriate name 
  
 Versions History:
 =================

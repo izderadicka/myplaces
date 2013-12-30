@@ -15,13 +15,13 @@ log=logging.getLogger('mp.sockets')
 @namespace('/log')
 class LogController(BaseNamespace):
     def initialize(self):
-        log.debug('Log Controller started')
+        
         if  not self.request.user.is_authenticated():
-            print '###ILLEGAL ACCESS'
+            log.warn('Illegal access to socketio')
             self.error('ILLEGAL_ACCESS', 'You are not logged in')
             self.disconnect()
         else:
-            print '###OK ACCESS'
+            log.debug('socketio - Log Controller started')
         
     def on_start(self, stream_id):
         log.debug('Started %s', stream_id)
@@ -38,11 +38,10 @@ class LogController(BaseNamespace):
             try:
                 remote.poll_msg(socket, on_msg)
             except remote.TimeoutError:
-                print "##TIMEOUT"
                 log.warn('SUB socket timeout')
                 self.disconnect()
         finally:
             socket.close()
             
-        print "##END"
+        log.debug('socketio - Log Controller finished')
         
