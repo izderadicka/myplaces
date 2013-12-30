@@ -28,7 +28,10 @@ You can start one (lightweight, send only) on your server as per instructions ht
  apt-get install -y build-essential
  apt-get install -y python-pip
  #headers to compile some python packages
- apt-get install -y libevent-dev libxml2-dev libxslt1-dev libfreetype6-dev
+ apt-get install -y libevent-dev libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev zlib1g-dev
+ ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
+ ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
+ ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
  
  #numpy and matplotlib would be quicker from distro packages
  apt-get install -y python-numpy python-matplotlib
@@ -102,8 +105,9 @@ Now can install the code
  pip -r requirements.pip
 
 
- #optionally run tests
+ #log as user, who will run backend servers
  su ivan
+ #optionally run tests
  ./manage.py test myplaces
 
  #create db, admin account and load initial groups
@@ -117,16 +121,29 @@ edit settings.py
 - change DEBUG to False !!!
 - set log location (file log handled in LOGGING)
 - plus modify any other settings as appropriate (email address etc.)
+
+test server:
+ ./manage.py runserver_socketio  #  now should be able to see something in browser
+ exit
  
+prepare script for running backend server and start them
+ cp deploy/mp-servers /usr/local/bin
+ nano /usr/local/bin/mp-servers #edit base directory, python interpreter
+ mp-servers start
+ mp-servers status # should see two lines for two processes
  
 start browser - go to site url
 
-login to /admin - change site name to appropriate name 
+login to /admin - change site name and url  to appropriate values 
  
 Versions History:
 =================
 
-0.1 - Initial version - under construction - use at your own risk 
+0.1 Initial version
+- provides collections of places, complete interface to manage and view
+- imports/exports in CSV,GPX, GEOJSON formats
+- voronoi diagram visualization
+- now running live at http://my-places.eu
 
 License:
 =========

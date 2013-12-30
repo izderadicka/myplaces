@@ -26,11 +26,12 @@ from django.core.exceptions import ValidationError
 from django import forms
 from django.contrib.auth.models import User
 from django.views.generic.edit import UpdateView
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from lockout.exceptions import LockedOut
 from django.contrib.admin.sites import AdminSite
+import urlparse
 
 @receiver(user_activated)
 def on_user_activated(sender, **kwargs):
@@ -137,7 +138,12 @@ class ProfileView(UpdateView):
     template_name='registration/profile_form.html'
     model=User
     form_class=ProfileForm
-    success_url=reverse_lazy('home')
+    
+    @property
+    def success_url(self):
+        return urlparse.urljoin('http://', self.request.META.get('HTTP_HOST', ''),  reverse('home'))
+
+       
     
     def get_object(self):
         return self.request.user
