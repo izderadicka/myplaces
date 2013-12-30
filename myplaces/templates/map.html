@@ -35,7 +35,10 @@ height: 100%;
 <script>
 
 var mapObject=createMap('map', {backControl:'topleft', locateControl:'topleft', layersControl:'topright'});
-{% if params.group_id%}
+
+{% if group_id%}
+mapObject.displayGroup({{group_id}}{%if place_id%}, {{place_id}}{%endif%});
+{%elif params and params.group_id%} 
 mapObject.displayGroup({{params.group_id}}{%if params.place_id%}, {{params.place_id}}{%endif%});
 {%else%}
 mapObject.map.setView([49,15], 12);
