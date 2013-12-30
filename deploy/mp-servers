@@ -8,8 +8,8 @@ PYTHON=bin/python
 
 do_start () {
 cd $DIR
-sudo -b -u $USER $PYTHON manage.py runserver_socketio 1>/dev/null 2>&1
-sudo -b -u $USER $PYTHON manage.py process_server 1>/dev/null 2>&1
+sudo -b -H -u $USER $PYTHON manage.py runserver_socketio 1>/dev/null 2>&1
+sudo -b -H -u $USER $PYTHON manage.py process_server 1>/dev/null 2>&1
 
 }
 

@@ -28,7 +28,7 @@ You can start one (lightweight, send only) on your server as per instructions ht
  apt-get install -y build-essential
  apt-get install -y python-pip
  #headers to compile some python packages
- apt-get install -y libevent-dev libxml2-dev libxslt1-dev
+ apt-get install -y libevent-dev libxml2-dev libxslt1-dev libfreetype6-dev
  
  #numpy and matplotlib would be quicker from distro packages
  apt-get install -y python-numpy python-matplotlib
