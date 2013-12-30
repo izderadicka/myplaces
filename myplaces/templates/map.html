@@ -1,6 +1,7 @@
 {%extends 'base.html'%}
 {% load url from future %}
 {% load i18n %} 
+{% load utility_tags %}
 {%block title%}
 {% trans 'Map' %}
 {%endblock%}
@@ -13,8 +14,8 @@
 <script src="{{STATIC_URL}}js/Leaflet.markercluster-0.4/leaflet.markercluster-src.js"></script>
 
 {%else%}
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
-<script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js?2"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet-0.7.1/leaflet.css" />
+<script src="{%proto%}://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.1/leaflet.js"></script>
 <link rel="stylesheet" href="{{STATIC_URL}}js//Leaflet.markercluster-0.4/MarkerCluster.css" />
 <link rel="stylesheet" href="{{STATIC_URL}}js/Leaflet.markercluster-0.4/MarkerCluster.Default.css" />
 <script src="{{STATIC_URL}}js/Leaflet.markercluster-0.4/leaflet.markercluster.js"></script>

@@ -31,3 +31,11 @@ def full_url(context, url_ref, secure=None, encode=None):
         if encode:
             url=urllib.quote(url)
         return url
+    
+@register.simple_tag(takes_context=True)
+def proto(context):
+    req=context.get('request')
+    if req and req.is_secure():
+        return 'https'
+    else:
+        return 'http'
