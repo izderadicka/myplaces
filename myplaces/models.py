@@ -175,17 +175,14 @@ class Place(Auditable):
               'id': self.id,
               'geometry': {'type':'Point', 'coordinates':[self.position.x, self.position.y]},
               'properties':{'name':self.name,}}
-        
-        if details:
-            if self.url:
+        if self.url:
                 data['properties']['url']=self.url
-                if self.description:
-                    data['properties']['description']=self.description
-        else:
-            if self.description:
+        if self.description:
+            if details:
+                data['properties']['description']=self.description
+            else:
                 data['properties']['description'] =self.description if len(self.description)<=80 else \
-                    self.description[:77]+'...'
-                
+                    self.description[:77]+'...'   
         if self.address:
             if details:
                 adr={}
