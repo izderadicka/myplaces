@@ -427,6 +427,16 @@ form .small_btn {
     background-size:26px auto;
 }
 
+a.edit_btn_map {
+    background: url("/static/mp/img/edit.svg") no-repeat scroll 4px 4px #FFFFFF;
+    background-size:24px auto;
+    background: url("/static/mp/img/edit.svg") no-repeat scroll 4px 4px / 24px auto #FFFFFF;
+    display: block;
+    position: absolute;
+    right: -41px;
+    top: 0;
+}
+
 .dialog {
 	 background: none repeat scroll 0 0 #FFFFFF;
    border: 1px solid #000000;

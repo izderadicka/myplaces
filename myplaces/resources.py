@@ -103,7 +103,7 @@ class OwnerField(rest_framework.fields.Field):
     def to_native(self, value):
         if not self.context.get('request'):
             return False
-        return value==self.context['request'].user
+        return value.can_edit(self.context['request'].user)
     
 class CountField(rest_framework.fields.Field):
     def to_native(self, value):
@@ -123,7 +123,7 @@ class LocationField(rest_framework.fields.CharField):
     
     
 class BaseSerializer(ModelSerializer):
-    is_mine=OwnerField(source='created_by')
+    is_mine=OwnerField(source='*')
     
 class AddressesSerializer(BaseSerializer):
     class Meta:

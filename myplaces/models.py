@@ -53,6 +53,12 @@ class Auditable (models.Model):
             self.updates+=1
         super(Auditable,self).save(*args, **kwargs)
     objects=ModManager()
+    
+    def can_edit(self, user):
+        # open for more more complex policy
+        if not user:
+            return False
+        return user==self.created_by
     class Meta ():
         abstract=True;
         
@@ -90,14 +96,14 @@ class PlacesGroup(Auditable):
     def __unicode__(self):
         return self.name
     
-    def as_geojson(self,  places=None, details=False):
+    def as_geojson(self,  places=None, details=False, user=None):
         str_file=StringIO()
         str_file.write('{"type":"FeatureCollection", "features":[')
         if not places:
             places=self.places.all().order_by('name')
         length=places.count()
         for pos,p in enumerate(places) :
-            str_file.write(p.as_geojson(details))
+            str_file.write(p.as_geojson(details,user))
             if pos < length-1:
                 str_file.write(', ')
         str_file.write(']}')
@@ -169,7 +175,7 @@ class Place(Auditable):
     
     objects = models.GeoManager()
     
-    def as_geojson(self, details=False):
+    def as_geojson(self, details=False, user=None):
         
         data={'type':'Feature',
               'id': self.id,
@@ -177,6 +183,8 @@ class Place(Auditable):
               'properties':{'name':self.name,}}
         if self.url:
                 data['properties']['url']=self.url
+        if self.can_edit(user) and not details:
+            data['properties']['group']=self.group.id
         if self.description:
             if details:
                 data['properties']['description']=self.description

@@ -8,7 +8,7 @@
     z-index: 9999;
     }
     
-div.button-control {
+.button-control {
     border: 1px solid lightgray;
     border-radius: 6px 6px 6px 6px;
     height: 32px;

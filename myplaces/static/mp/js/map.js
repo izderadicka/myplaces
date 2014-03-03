@@ -263,7 +263,7 @@ var createMap = function(elementId, options) {
 			place.openPopup();
 		};
 
-		var format_popup = function(props) {
+		var format_popup = function(props, place_id) {
 			var html = '';
 			var head = '<h3>' + props.name + '</h3>';
 			if (props.url) {
@@ -272,6 +272,10 @@ var createMap = function(elementId, options) {
 			}
 
 			html += head;
+			if (props.group) {
+				html+='<a class="edit_btn_map button-control" href="#place/edit/'+props.group+
+				'/'+place_id+'"></a>'
+			}
 			if (props.address) {
 				html += '<p class="address">' + props.address + '</p>';
 			}
@@ -296,7 +300,7 @@ var createMap = function(elementId, options) {
 					onEachFeature : function(feature, layer) {
 
 						if (feature.properties && feature.properties.name) {
-							layer.bindPopup(format_popup(feature.properties),{maxWidth:260});
+							layer.bindPopup(format_popup(feature.properties, feature.id),{maxWidth:260});
 							layer.on('click',
 									function(event) {
 										addToHistory();

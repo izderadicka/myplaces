@@ -94,7 +94,7 @@ def group_geojson(request, group_id):
     except PlacesGroup.DoesNotExist:
         return HttpResponseNotFound('Non existent group id')
     
-    return HttpResponse(group.as_geojson(), mimetype='application/json')
+    return HttpResponse(group.as_geojson(user=request.user), mimetype='application/json')
 
 
 def group_voronoi_geojson(request, group_id):
