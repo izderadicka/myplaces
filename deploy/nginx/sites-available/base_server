@@ -23,6 +23,10 @@
         location /static/ {
                 try_files $uri =404;
         }
+        
+         location /sitemap.xml {
+                try_files /static/sitemap.xml =404;
+        }
 
 	#cached locations - long term
 	location ~/js-locale/.*|/mp/js-restAPI {

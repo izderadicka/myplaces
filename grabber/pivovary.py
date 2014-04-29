@@ -13,7 +13,7 @@ import logging
 import optparse
 import csv
 from geopy import geocoders 
-from geopy.geocoders.base import GeocoderError
+from geopy.exc import GeopyError as GeocoderError
 import sys
 import base64
 logging.basicConfig(level=logging.DEBUG)
@@ -80,6 +80,9 @@ def parse_page(link):
                 
                 places=gcoder.geocode(address, exactly_one=False, bounds="48.195387,11.028442|51.103522,19.356079")
                 indx=0
+                if not places:
+                    log.error('Cannot get location for address %s', data['address'])
+                    break
                 if len(places)>1:
                     log.error('Returned more place then 1 - %d: %s', len(places), places)
                     ln=0
@@ -119,7 +122,6 @@ def parse_page(link):
     
     www=body.find(text=WWW_RE)
     if www:
-Exception Location:     /usr/lib/python2.7/dist-packages/django/template/context.py in __getitem__, line 54
         www=u'http://'+unicode(www).strip()
         try:
             urllib2.urlopen(www, timeout=15)
