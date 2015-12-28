@@ -1,6 +1,6 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.contrib.gis import admin
 import myplaces.urls
 import myplaces.remote as remote

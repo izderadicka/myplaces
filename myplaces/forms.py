@@ -47,6 +47,7 @@ class Place(AuditableModelForm):
 class Address(AuditableModelForm):
     class Meta():
         model=Address
+        fields = "__all__" 
         
         
 

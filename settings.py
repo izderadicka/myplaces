@@ -31,7 +31,7 @@ DATABASES = {
         'PASSWORD': 'maps',                  # Not used with sqlite3.
         'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-        'OPTIONS': {'autocommit': True,}
+        
     }
 }
 
@@ -240,7 +240,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'with_date',
-            'filename': '/home/ivan/workspace/mapy/logs/log.txt', #'/var/log/myplaces/log.txt',
+            'filename': '/tmp/myplaces_log.txt', #'/var/log/myplaces/log.txt',
             'maxBytes': 10485760,
             'backupCount':3,
         },

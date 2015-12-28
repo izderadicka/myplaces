@@ -4,8 +4,8 @@ Created on May 28, 2013
 @author: ivan
 '''
 
-from django.conf.urls.defaults import patterns, include, url
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, include, url
+from django.conf.urls import *
 import views
 from django.views.generic import TemplateView, ListView
 from models import PlacesGroup

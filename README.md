@@ -28,7 +28,7 @@ You can start one (lightweight, send only) on your server as per instructions ht
  apt-get install -y build-essential
  apt-get install -y python-pip
  #headers to compile some python packages
- apt-get install -y libevent-dev libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev zlib1g-dev
+ apt-get install -y libevent-dev libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev zlib1g-dev python-dev
  ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
  ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
  ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
@@ -64,6 +64,8 @@ Install:
 Creating DB - switch to postgres user
  su postgres
  createuser -PRSd maps
+ #for running tests need superuser rights for postgis
+ #createuser -Ps maps
  createdb -O maps -e maps
  psql -a -c "CREATE EXTENSION unaccent;"   maps
  psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
@@ -111,7 +113,7 @@ Now can install the code
  ./manage.py test myplaces
 
  #create db, admin account and load initial groups
- ./manage.py syncdb
+ ./manage.py migrate
  ./manage.py loaddata myplaces/fixtures/default_groups.json
 
  #collect static data
