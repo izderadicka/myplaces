@@ -29,17 +29,18 @@ You can start one (lightweight, send only) on your server as per instructions ht
  apt-get install -y python-pip
  #headers to compile some python packages
  apt-get install -y libevent-dev libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev zlib1g-dev python-dev
+ 
+ #Below was needed only on 12.04?
  ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
  ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
  ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
  
  #numpy and matplotlib would be quicker from distro packages
  apt-get install -y python-numpy python-matplotlib
- #postgres database 9.1+ recommended, python driver, postgis
- apt-get install -y postgresql python-psycopg2 postgresql-9.1-postgis postgresql-contrib-9.1
+ #postgres database 9.3+ recommended postis 2.1, python driver, postgis
+ apt-get install -y postgresql python-psycopg2 postgis postgresql-9.3-postgis-2.1  postgresql-contrib
 
  apt-get install -y git
-
  apt-get install gdal-bin
 
  #create user to run python backend
@@ -68,12 +69,15 @@ Creating DB - switch to postgres user
  #createuser -Ps maps
  createdb -O maps -e maps
  psql -a -c "CREATE EXTENSION unaccent;"   maps
- psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
- psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
- psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis_comments.sql
- #template_postgis is only needed for running tests
- createdb -T maps template_postgis
- psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';"
+ 
+ # This was needed for postgres 9.1
+ # psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+ # psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+ # psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis_comments.sql
+ # template_postgis is only needed for running tests, but it does not work in new Django anyhow
+ # createdb -T maps template_postgis
+ # psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';"
+ 
  exit
 
 Now can install the code
@@ -104,20 +108,26 @@ Now can install the code
  chown ivan:www-data /var/log/myplaces
 
  # install dependencies
- pip -r requirements.pip
+ pip -r requirements.txt
 
 
- #log as user, who will run backend servers
- su ivan
- #optionally run tests
- ./manage.py test myplaces
+#create db, admin account and load initial groups
 
- #create db, admin account and load initial groups
  ./manage.py migrate
  ./manage.py loaddata myplaces/fixtures/default_groups.json
 
+ #log as user, who will run backend servers
+ su ivan
+ 
+ #optionally run tests
+ ./manage.py test myplaces
+
+ 
+
  #collect static data
  ./manage.py collectstatic
+```
+
 
 edit settings.py
 - change DEBUG to False !!!

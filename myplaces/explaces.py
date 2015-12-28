@@ -38,7 +38,7 @@ class ExportView( View, PlacesSearchMixin):
             fmt=format.get_fmt_descriptor(fmt)
         except KeyError:
             raise Http404('Invalid format name')
-        response=HttpResponse(mimetype=fmt.mime)
+        response=HttpResponse(content_type=fmt.mime)
         fname=group.name.encode('utf-8') + ('.'+fmt.extensions[0] if fmt.extensions else '')
         response['Content-Disposition']= 'attachment; filename="%s"'%fname
         adapter=fmt.export_adapter

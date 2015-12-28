@@ -78,7 +78,7 @@ def import_places(temp_file, extra_params, name, description=None, private=False
                 log.debug('Skipping line %d as existing', line)
             if existing=='update' or not place:
                 try:
-                    with transaction.commit_on_success():
+                    with transaction.atomic():
                         if not place:
                             place=Place(name=place_name, group=group)
                         address=None

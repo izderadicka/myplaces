@@ -71,7 +71,7 @@ class Auditable (models.Model):
         return self.__class__.objects.filter(created_by=user).count()
         
     def get_limit(self, user):
-        if user and user.has_perm('myplaces.higher_limit_'+ self._meta.module_name):
+        if user and user.has_perm('myplaces.higher_limit_'+ self._meta.model_name):
             return self.max_objects_higher
         return self.max_objects
         

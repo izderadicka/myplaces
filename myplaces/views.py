@@ -22,7 +22,7 @@ import format
 def rr(request, template, ctx):
     return render_to_response(template, ctx, context_instance=RequestContext(request))
 def rjson(ctx):
-    return HttpResponse(json.dumps(ctx), mimetype="application/json")
+    return HttpResponse(json.dumps(ctx), content_type="application/json")
 
 def upload_places(request, step):
     flavour=django_mobile.get_flavour(request, 'full')
@@ -94,13 +94,13 @@ def group_geojson(request, group_id):
     except PlacesGroup.DoesNotExist:
         return HttpResponseNotFound('Non existent group id')
     
-    return HttpResponse(group.as_geojson(user=request.user), mimetype='application/json')
+    return HttpResponse(group.as_geojson(user=request.user), content_type='application/json')
 
 
 def group_voronoi_geojson(request, group_id):
     json_data=voronoi_remote(group_id)
             
-    return HttpResponse(json_data, mimetype='application/json')
+    return HttpResponse(json_data, content_type='application/json')
 
 
     

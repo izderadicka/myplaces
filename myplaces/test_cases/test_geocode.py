@@ -188,7 +188,7 @@ class TestGeocode(unittest.TestCase):
         
         
         adr, p=c.reverse('50.0027028,15.0414849')
-        self.assertEqual(adr.postal_code, '28104')
+        self.assertEqual(adr.postal_code, '28107')
 
 NO=-1                  
 if __name__=='__main__':

@@ -18,6 +18,7 @@ import uuid
 import base64
 import pickle
 import logging
+from zmq.devices import ThreadDevice
 
 log=logging.getLogger('mp.remote')
 
@@ -182,7 +183,7 @@ def do_remote_call(socket, new_proc=True, allowed_methods=None, extra_kwargs={})
         
 
 def run_proxy(context):   
-    proxy=zmq.devices.ThreadDevice(zmq.QUEUE, zmq.XSUB,zmq.XPUB )
+    proxy=ThreadDevice(zmq.QUEUE, zmq.XSUB,zmq.XPUB )
     proxy.bind_in(ADDR_SUB)
     #proxy.setsockopt_in(zmq.SUBSCRIBE, '')
     proxy.bind_out(ADDR_PUB)
