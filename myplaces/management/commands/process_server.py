@@ -14,7 +14,7 @@ import logging
 from optparse import make_option
 import zmq
 import time
-from myplaces.voronoi_util import calc_voronoi #must import to register remote method
+from myplaces.voronoi_calc import calc_voronoi #must import to register remote method
 
 
 

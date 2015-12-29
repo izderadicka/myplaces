@@ -15,7 +15,7 @@ from optparse import make_option
 
 
 import gevent.monkey
-gevent.monkey.patch_all()
+gevent.monkey.patch_all(thread=False)
 from psycogreen.gevent import patch_psycopg
 patch_psycopg()
 
@@ -53,7 +53,7 @@ class Command(BaseCommand):
         #   io.Socket JS constructor
         # allowing the port to be set as the client-side default there.
         environ["DJANGO_SOCKETIO_PORT"] = str(self.port)
-        if settings.DEBUG:
+        if settings.DEBUG and False:
             start_new_thread(reload_watcher, ())
         try:
             bind = (self.addr, int(self.port))

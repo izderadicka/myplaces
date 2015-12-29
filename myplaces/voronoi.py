@@ -7,8 +7,7 @@ Inspired by code https://github.com/rougier/neural-networks/blob/master/voronoi.
 
 import sys
 import numpy as np
-import matplotlib.tri
-import matplotlib.pyplot as plt
+from matplotlib.tri import Triangulation
 import time
 from fortune import computeVoronoiDiagram, Site
 
@@ -59,7 +58,7 @@ def voronoi2(P, bbox=None):
         bbox=(xmin-xrange, ymin-yrange, xmax+xrange, ymax+yrange)
     bbox=np.round(bbox,4)
         
-    D = matplotlib.tri.Triangulation(P[:,0],P[:,1])
+    D = Triangulation(P[:,0],P[:,1])
     T = D.triangles
     n = T.shape[0]
     C = circumcircle2(P[T])
@@ -102,6 +101,8 @@ METHODS=['matplotlib',# calculated from Delaunay triagulation as dual graph
 
 
 if __name__=='__main__':
+    import matplotlib.pyplot as plt
+    import matplotlib
     method='matplotlib'
     if len(sys.argv)>1:
         method=sys.argv[1]
@@ -133,7 +134,7 @@ if __name__=='__main__':
     print 'voronoi took %f secs' % (time.time()-now, )
     #print lines
     plt.scatter(points[:,0], points[:,1], color="blue")
-    tri=matplotlib.tri.Triangulation(points[:,0], points[:,1])
+    tri=Triangulation(points[:,0], points[:,1])
     plt.triplot(points[:,0], points[:,1], tri.triangles, color="yellow")
     circles=circumcircle2(points[tri.triangles])
     plt.scatter(circles[:,0], circles[:,1], 40, color='green', marker='x')
