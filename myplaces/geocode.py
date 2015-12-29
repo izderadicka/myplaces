@@ -301,7 +301,7 @@ def get_coordinates_remote(adr, alternate=False, reverse=False, context=None):
     socket=ctx.socket(zmq.REQ)  
     try:
         socket.connect(settings.REMOTE_ADDR_GEOCODE)
-        pos=remote.call_remote(socket, 'geocode_remote', (adr, alternate, reverse),  timeout=60)
+        pos=remote.call_remote(socket, 'geocode_remote', (adr, alternate, reverse),  timeout=120)
     finally:
         socket.close()
     

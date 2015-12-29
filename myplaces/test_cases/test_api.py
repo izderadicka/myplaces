@@ -11,7 +11,7 @@ import httplib, urllib, urlparse
 import json
 from copy import copy
 from django import test
-import myplaces.resources as resources
+from django.conf import settings
 from myplaces.models import PlacesGroup
 
 
@@ -22,7 +22,7 @@ class ApiError(Exception):
             self.body=json.loads(body) if body else None
         except ValueError:
             self.body=str(body)
-        super(ApiError, self).__init__(msg+' ('+str(status)+')')
+        super(ApiError, self).__init__('%s (%d) : %s'% (msg, status, body))
 class ApiClient():
     PLACE='place'
     GROUP="group"
@@ -109,6 +109,11 @@ class ApiClient():
 class TestApi(test.LiveServerTestCase):
 
     fixtures=[ "test_data_auth.json", "test_data.json",]
+    
+    def __init__(self, *args, **kwargs):
+        super(TestApi, self).__init__(*args, **kwargs)
+        settings.DEBUG=True
+        
     def test_access(self):
         c=ApiClient()
         groups=c.get(ApiClient.GROUP)
@@ -138,6 +143,17 @@ class TestApi(test.LiveServerTestCase):
         
         
     def test_filter(self):
+        
+        #need unaccent extension for filters
+        from django.db import connection
+        c= connection.cursor()
+        try: 
+            c.execute('CREATE EXTENSION unaccent;')
+        except:
+            pass
+        finally:
+            c.close()
+        
         c=ApiClient("user", "user")
         
         places=c.get(ApiClient.PLACE, filter={'name':'1'})

@@ -19,45 +19,41 @@ You can start one (lightweight, send only) on your server as per instructions ht
 
  #nginx - we will need relativelly recent version for websocket support
  apt-get install -y python-software-properties
- apt-get install -y python-dev
  add-apt-repository ppa:nginx/stable
  apt-get update
  apt-get install -y nginx-light
  /etc/init.d/nginx start
  #you can test not via browser
+ 
+ 
  apt-get install -y build-essential
  apt-get install -y python-pip
  #headers to compile some python packages
  apt-get install -y libevent-dev libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev zlib1g-dev python-dev
  
  #Below was needed only on 12.04?
- ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
- ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
- ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
+ # ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
+ # ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
+ # ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
  
- #numpy and matplotlib would be quicker from distro packages
- apt-get install -y python-numpy python-matplotlib
+ 
  #postgres database 9.3+ recommended postis 2.1, python driver, postgis
  apt-get install -y postgresql python-psycopg2 postgis postgresql-9.3-postgis-2.1  postgresql-contrib
 
  apt-get install -y git
- apt-get install gdal-bin
-
- #create user to run python backend
- adduser ivan
- usermod -G postgres,www-data -a ivan
+ apt-get install gdal-bin  # why ? maybe not needed
 
  #assure you have libzmq >= 3.2.3, may install it from source (ubuntu 13.04 has 2.2) - http://zeromq.org/intro:get-the-software
- #may not be needed
- apt-get install -y  libtool  autoconf  automake
- apt-get install -y  uuid-dev
- wget http://download.zeromq.org/zeromq-3.2.4.tar.gz
- tar xvzf zeromq-3.2.4.tar.gz 
- cd zeromq-3.2.4/
- ./configure
- make
- make install
- ldconfig
+ # not be needed
+ # apt-get install -y  libtool  autoconf  automake
+ # apt-get install -y  uuid-dev
+ # wget http://download.zeromq.org/zeromq-3.2.4.tar.gz
+ # tar xvzf zeromq-3.2.4.tar.gz 
+ # cd zeromq-3.2.4/
+ # ./configure
+ # make
+ # make install
+ # ldconfig
 
 Install:
 ========
@@ -79,6 +75,10 @@ Creating DB - switch to postgres user
  # psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';"
  
  exit
+ 
+#create user to run python backend
+ adduser ivan
+ usermod -G postgres,www-data -a ivan
 
 Now can install the code
  #getcode from github
