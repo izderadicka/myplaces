@@ -1,3 +1,7 @@
+import gevent.monkey
+gevent.monkey.patch_all()
+from psycogreen.gevent import patch_psycopg
+patch_psycopg()
 
 from re import match
 from thread import start_new_thread
@@ -13,11 +17,6 @@ from django.utils.autoreload import code_changed, restart_with_reloader
 from socketio.server import SocketIOServer
 from optparse import make_option
 
-
-import gevent.monkey
-gevent.monkey.patch_all(thread=False)
-from psycogreen.gevent import patch_psycopg
-patch_psycopg()
 
 RELOAD = False
 

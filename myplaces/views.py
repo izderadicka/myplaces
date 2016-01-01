@@ -4,7 +4,7 @@ import forms
 from django.template.context import RequestContext
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import UpdateView
-
+from django.conf import settings
 import logging
 from django.http import HttpResponse, HttpResponseBadRequest,\
     HttpResponseNotFound
@@ -49,7 +49,8 @@ def _upload_places_2(request,step, form):
     ctx={'step':step,
          'step_1':utils.serialize(form),
         'stream_id': tmp_file,
-        'group_exists':group_exists}
+        'group_exists':group_exists,
+        'sio_port':settings.SIO_PORT}
     addon=format.get_fmt_descriptor(form['file_format']).import_addon
     template='upload2.html'
     if addon:

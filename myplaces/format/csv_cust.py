@@ -254,7 +254,7 @@ class CSVImportExtra(ImportFormAddon):
 @export_adapter
 class CSVAdapter(ExportAdapter):  
     HEADERS_GENERAL=['name', 'description', 'url', 'position'] 
-    HEADERS_ADDRESS=['street', 'city', 'county', 'state', 'country', 'postal_code', 'phone', 'email']
+    HEADERS_ADDRESS=['street', 'city', 'county', 'state', 'country', 'postal_code', 'phone', 'email', 'unformatted']
     
     def export(self, group, places):
         writer=csv.DictWriter(self.response, self.HEADERS_GENERAL+self.HEADERS_ADDRESS)

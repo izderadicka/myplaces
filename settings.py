@@ -10,7 +10,8 @@ ADMINS = (
      ('Ivan', 'admin@my-places.eu'),
 )
 
-
+#Port for socketio server
+SIO_PORT=8008
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
