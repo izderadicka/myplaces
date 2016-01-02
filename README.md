@@ -1,10 +1,36 @@
 MyPlaces is a platform for presenting geographical information (initially mainly places) on maps.
 It's based on django, geo-django, postgis and uses OpenStreetMap data and services.
 
+Run in Docker
+=============
+Easy way how to test it is to start application in docker (install docker-engine and docker-compose as described here https://docs.docker.com/compose/install/):
+
+```
+cd deploy/docker
+docker-compose build
+docker-compose run --rm web deploy/docker/init.sh # if fails try second time
+docker-compose up
+
+```
+
+
+Manual Install
+==============
+Application can be installed in blank linux (Debian/Ubuntu). 
+There are 3 servers which should run:
+- web -  this is Django application - can be deployed as usual (WSGI application), or manage.py runserver for testing purposes
+- socketio server - ./runsocketio.py
+- remote processes server - ./ manage.py process_server
+
+
+Below are approximate steps to make it 
+running.
+
+It is bit outdated will need some updates.
 
 Prerequisities
-==============
-Scrips below are for ubuntu 12.04+/Debian - do not forget to upgrade your install to latest version - apt-get update; apt-get dist-upgrade
+--------------
+Scrips below are for ubuntu 14.04+/Debian - do not forget to upgrade your install to latest version - apt-get update; apt-get dist-upgrade
 Scripts shall be run under root (if logged in under other user use sudo)
 SMTP server to send email
 You can start one (lightweight, send only) on your server as per instructions https://library.linode.com/email/exim/send-only-mta-ubuntu-12.04-precise-pangolin
@@ -31,32 +57,16 @@ You can start one (lightweight, send only) on your server as per instructions ht
  #headers to compile some python packages
  apt-get install -y libevent-dev libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev zlib1g-dev python-dev
  
- #Below was needed only on 12.04?
- # ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
- # ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
- # ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
- 
- 
  #postgres database 9.3+ recommended postis 2.1, python driver, postgis
- apt-get install -y postgresql python-psycopg2 postgis postgresql-9.3-postgis-2.1  postgresql-contrib
+ apt-get install -y postgresql python-psycopg2  postgresql-9.3-postgis-2.1  postgresql-contrib
 
  apt-get install -y git
- apt-get install gdal-bin  # why ? maybe not needed
+ apt-get install -y gdal-bin  libproj-dev
 
- #assure you have libzmq >= 3.2.3, may install it from source (ubuntu 13.04 has 2.2) - http://zeromq.org/intro:get-the-software
- # not be needed
- # apt-get install -y  libtool  autoconf  automake
- # apt-get install -y  uuid-dev
- # wget http://download.zeromq.org/zeromq-3.2.4.tar.gz
- # tar xvzf zeromq-3.2.4.tar.gz 
- # cd zeromq-3.2.4/
- # ./configure
- # make
- # make install
- # ldconfig
+ 
 
 Install:
-========
+-------
 ```
 Creating DB - switch to postgres user
  su postgres
@@ -65,15 +75,7 @@ Creating DB - switch to postgres user
  #createuser -Ps maps
  createdb -O maps -e maps
  psql -a -c "CREATE EXTENSION unaccent;"   maps
- 
- # This was needed for postgres 9.1
- # psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
- # psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
- # psql -d maps -f /usr/share/postgresql/9.1/contrib/postgis_comments.sql
- # template_postgis is only needed for running tests, but it does not work in new Django anyhow
- # createdb -T maps template_postgis
- # psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';"
- 
+ psql -a -c "CREATE EXTENSION postgis;"   maps
  exit
  
 #create user to run python backend
@@ -122,7 +124,6 @@ Now can install the code
  #optionally run tests
  ./manage.py test myplaces
 
- 
 
  #collect static data
  ./manage.py collectstatic
@@ -135,10 +136,10 @@ edit settings.py
 - plus modify any other settings as appropriate (email address etc.)
 
 test server:
- ./manage.py runserver_socketio  #  now should be able to see something in browser
- exit
+ ./manage.py runserver 0.0.0.0:8000  #  now should be able to see something in browser http://host_name:8000
+ # stop it Crtl-C
  
-prepare script for running backend server and start them
+prepare script for running backend servers and start them
  cp deploy/mp-servers /usr/local/bin
  nano /usr/local/bin/mp-servers #edit base directory, python interpreter
  mp-servers start
@@ -157,6 +158,8 @@ Versions History:
 - voronoi diagram visualization
 - now running live at http://my-places.eu
 
-License:
+0.1.2 Updated for Django 1.8 and Docker environment
+
+License:- "8000:8000"
 =========
 [BSD license](http://opensource.org/licenses/BSD-3-Clause) (same as Django)
