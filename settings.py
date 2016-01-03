@@ -34,7 +34,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': get_env('maps', 'DB_MAPS_NAME', 'PGDATABASE'),                      # Or path to database file if using sqlite3.
+        'NAME': get_env('maps', 'DB_MAPS_NAME', 'PGDATABASE    '),                      # Or path to database file if using sqlite3.
         'USER': get_env('maps', 'DB_MAPS_USER', 'OPENSHIFT_POSTGRESQL_DB_USERNAME'),                      # Not used with sqlite3.
         'PASSWORD': get_env('maps', 'DB_MAPS_PASSWORD', 'OPENSHIFT_POSTGRESQL_DB_PASSWORD'),                  # Not used with sqlite3.
         'HOST': get_env('127.0.0.1', 'DB_PORT_5432_TCP_ADDR', 'OPENSHIFT_POSTGRESQL_DB_HOST'),                      # Set to empty string for localhost. Not used with sqlite3.
