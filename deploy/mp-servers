@@ -1,15 +1,18 @@
 #!/bin/bash
 
 #simple script to start both servers 
+if [ -n "$OPENSHIFT_REPO_DIR" ] ; then
+DIR=$OPENSHIFT_REPO_DIR
+else
+echo 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"
+fi
 
-DIR=/home/ivan/workspace/mapy
-USER=ivan
-PYTHON=bin/python
 
 do_start () {
 cd $DIR
-sudo -b -H -u $USER $PYTHON runsocketio.py 1>/dev/null 2>&1
-sudo -b -H -u $USER $PYTHON manage.py process_server 1>/dev/null 2>&1
+python runsocketio.py 1>/dev/null 2>&1 &
+python manage.py process_server 1>/dev/null 2>&1 &
 
 }
 
@@ -19,7 +22,6 @@ pkill -f process_server
 }
 
 do_status () {
-
 ps -ef|grep runsocketio.py|grep -vP "grep|sudo"
 ps -ef|grep process_server|grep -vP "grep|sudo"
 }
