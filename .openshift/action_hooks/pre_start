@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd $OPENSHIFT_REPO_DIR
-
-echo "Starting socketio and process servers"
-deploy/mp-servers start

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd $OPENSHIFT_REPO_DIR
+
+echo "Starting process servers"
+RUNNING=`ps -ef|grep process_server|grep -vP "grep|sudo"`
+if [ -z "$RUNNING" ]; then
+nohup python manage.py process_server 1>/dev/null 2>&1 &
+fi

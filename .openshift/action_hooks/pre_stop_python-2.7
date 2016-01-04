@@ -3,4 +3,4 @@
 cd $OPENSHIFT_REPO_DIR
 
 echo "Stoping socketio and process servers"
-deploy/mp-servers stop
+pkill -f process_server
