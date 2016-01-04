@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $OPENSHIFT_REPO_DIR
+
+echo "Stoping socketio and process servers"
+deploy/mp-servers stop
