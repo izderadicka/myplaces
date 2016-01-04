@@ -11,8 +11,8 @@ fi
 
 do_start () {
 cd $DIR
-python runsocketio.py 1>/dev/null 2>&1 &
-python manage.py process_server 1>/dev/null 2>&1 &
+nohup python runsocketio.py 1>/dev/null 2>&1 &
+nohup python manage.py process_server 1>/dev/null 2>&1 &
 
 }
 
