@@ -195,12 +195,13 @@ REST_FRAMEWORK = {
 }
 
 #remote workers
-REMOTE_ADDR_IMPORT='tcp://127.0.0.1:9999'
+local_ip=get_env('127.0.0.1', '$OPENSHIFT_INTERNAL_IP', '$OPENSHIFT_PYTHON_IP')
+REMOTE_ADDR_IMPORT='tcp://%s:19999'%local_ip
 REMOTE_ADDR_IMPORT_PROXY='ipc:///tmp/test_workers'
-REMOTE_ADDR_IMPORT_BROADCAST='tcp://127.0.0.1:9998' 
+REMOTE_ADDR_IMPORT_BROADCAST='tcp://%s:19998' % local_ip
 
-REMOTE_ADDR_GEOCODE='tcp://127.0.0.1:10009' 
-REMOTE_ADDR_CALC='tcp://127.0.0.1:10011'
+REMOTE_ADDR_GEOCODE='tcp://%s:20009' % local_ip
+REMOTE_ADDR_CALC='tcp://%s:20011' % local_ip
 
 
 #registration
