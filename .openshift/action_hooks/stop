@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo "Starting runsocketio"
+echo "Stopping runsocketio"
 pkill -f runsocketio.py || true
