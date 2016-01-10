@@ -10,8 +10,10 @@ ADMINS = (
      ('Ivan', 'admin@my-places.eu'),
 )
 
+openshift='OPENSHIFT_REPO_DIR' in os.environ
+
 #Port for socketio server
-SIO_PORT=8008
+SIO_PORT=8000 if openshift else 8008
 
 def get_env(default, *args):
     for name in args:
@@ -83,8 +85,8 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-if 'OPENSHIFT_REPO_DIR' in os.environ:
-    STATIC_ROOT=os.path.join(curr_dir, 'wsgi', 'static')
+if openshift:
+    STATIC_ROOT=os.path.join(curr_dir, 'public', 'static')
 else:
     STATIC_ROOT = '/var/www/static'
 

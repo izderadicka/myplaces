@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd $OPENSHIFT_REPO_DIR
+python runsocketio.py $OPENSHIFT_ADVANCED_PYTHON_IP:15000
