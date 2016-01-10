@@ -12,7 +12,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
 import django
 from django.conf import settings
-settings.ROOT_URLCONF = 'sioroot'
+#settings.ROOT_URLCONF = 'sioroot'
 
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.management.commands.runserver import naiveip_re
