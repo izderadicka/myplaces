@@ -7,4 +7,10 @@ RUNNING=`ps -ef|grep process_server|grep -vP "grep|sudo"`
 if [ -z "$RUNNING" ]; then
 nohup python manage.py process_server 1>/dev/null 2>&1 &
 fi
+
+echo "Starting runsocketio"
+RUNNING=`ps -ef|grep runsocketio.py|grep -vP "grep|sudo"`
+if [ -z "$RUNNING" ]; then
+nohup python runsocketio.py $OPENSHIFT_ADVANCED_PYTHON_IP:15000 1>/dev/null 2>&1 &
+fi
 exit 0
