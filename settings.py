@@ -254,7 +254,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'with_date',
-            'filename': get_env('/tmp/myplaces_log.txt', 'OPENSHIFT_LOG_DIR'), #'/var/log/myplaces/log.txt',
+            'filename': os.path.join(get_env('/tmp/', 'OPENSHIFT_LOG_DIR'), 'myplaces.log'), #'/var/log/myplaces/log.txt',
             'maxBytes': 10485760,
             'backupCount':3,
         },
