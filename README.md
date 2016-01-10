@@ -13,6 +13,29 @@ docker-compose up
 
 ```
 
+Openshift
+=========
+
+Live demo version is available on Openshift PaaS service:
+http://myplaces-ivanovo.rhcloud.com
+
+Deployment on openshift requires custom python cartridge from here: https://github.com/gsterjov/openshift-advanced-python-cartridge
+
+Plus couple of tweeks were needed:
+- lxml installation is causing problems - better to install it manually from ssh app shell
+- ssh shell is not running python, this helped:   
+	rhc env set LD_LIBRARY_PATH /opt/rh/python27/root/usr/lib64 -a myplaces
+- Have to set custom app server
+	rhc env set OPENSHIFT_PYTHON_SERVER=custom -a myplaces
+- In ssh shell :
+```
+cd  /var/lib/openshift/569218b07628e1059100005b/advanced-python//usr/nginx/versions/1.4/conf
+cp nginx.wsgiref.conf.erb nginx.custom.conf.erb
+cd $OPENSHIFT_REPO_DIR 
+python manage.py createsuperuser
+python manage.py loaddata myplaces/fixtures/default_groups.json
+
+```
 
 Manual Install
 ==============
