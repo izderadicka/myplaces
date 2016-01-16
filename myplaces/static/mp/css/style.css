@@ -295,7 +295,7 @@ table#import_table td {
 	border: 1px solid; 
 }
 table#import_table th {
-	border 2px solid;
+	border: 2px solid;
 	background-color: grey;
 }
 

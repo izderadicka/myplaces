@@ -470,6 +470,42 @@ var myPlacesApp=(function() {
 		template:'#group_places_detail',
 		listCache:listCache.place,
 		listView:PlaceListView,
+		
+		search: function() {
+			var s=$('.search', this.$el),
+			that=this,
+			toSearch=s.val(),
+			doSearch= function(phrase) {
+				lastSearch[s.attr('id')]=phrase;
+				that.renderList();
+			},
+			prec=4,
+			geoSearch = function(loc) {
+				var phrase = toSearch + ' from '+loc.coords.latitude.toFixed(prec)+','+
+					loc.coords.longitude.toFixed(prec);
+				console.log('Search phrase: '+phrase);
+				doSearch.call(this, phrase);
+			},
+			handleError = function(err) {
+				console.log('Geolocation error: '+err.message);
+				doSearch('');
+			},
+			posRe = /within\s+(\d+\.?\d*\w{1,3})?\s*$/ ;
+			
+			if (posRe.test(toSearch)) {
+				console.log('Trying to get current position');
+				if (navigator.geolocation) {
+			        navigator.geolocation.getCurrentPosition(geoSearch, handleError);
+			    } else {
+			    	console.log('Geolocation not supported');
+			    	doSearch('');
+			    }
+				
+			} else {
+				doSearch(toSearch);
+			}
+			
+		},
 
 		getNewPath:function() {
 			return '/place/new/'+this.model.id;
