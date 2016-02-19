@@ -1,10 +1,13 @@
-from setuptools import setup
+#from distutils.core import Extension, setup
+from setuptools import setup, Extension
+from Cython.Build import cythonize
 
-setup(name='YourAppName',
+setup(name='myplaces',
       version='1.0',
-      description='OpenShift App',
-      author='Your Name',
-      author_email='example@example.com',
-      url='http://www.python.org/sigs/distutils-sig/',
-#      install_requires=['Django>=1.3'],
+      description='Myplaces',
+      author='ivan',
+      author_email='ivan@zderadicka.eu',
+      url='http://zderadicka.eu',
+      install_requires=['cython>=0.23'],
+      ext_modules=cythonize(Extension(name='myplaces.voronoi', sources=['myplaces/voronoi.pyx']))
      )
