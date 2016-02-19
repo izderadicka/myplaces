@@ -1,6 +1,5 @@
 #from distutils.core import Extension, setup
-from setuptools import setup, Extension
-from Cython.Build import cythonize
+from setuptools import setup
 
 setup(name='myplaces',
       version='1.0',
@@ -8,6 +7,4 @@ setup(name='myplaces',
       author='ivan',
       author_email='ivan@zderadicka.eu',
       url='http://zderadicka.eu',
-      install_requires=['cython>=0.23'],
-      ext_modules=cythonize(Extension(name='myplaces.voronoi', sources=['myplaces/voronoi.pyx']))
      )

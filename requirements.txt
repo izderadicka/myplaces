@@ -18,6 +18,5 @@ geopy==0.97
 six
 numpy
 scipy>=0.17.0
-cython>=0.23
 
 
