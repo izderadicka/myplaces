@@ -139,7 +139,7 @@ class Address(Auditable):
             if item:
                 addr.append(uni(item))
         append_if_exists(self.street)
-        append_if_exists( u'%s %s'% (uni(self.postal_code), uni(self.city)) if self.postal_code else self.city)
+        append_if_exists( u'%s %s'% (uni(self.postal_code), uni(self.city)) if self.postal_code and self.city else self.city)
         append_if_exists(self.county)
         append_if_exists(self.state)
         append_if_exists(self.country)

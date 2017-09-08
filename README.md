@@ -13,8 +13,8 @@ docker-compose up
 
 ```
 
-Openshift
-=========
+Openshift v2 - deprecated
+============
 
 Live demo version is available on Openshift PaaS service:
 http://myplaces-ivanovo.rhcloud.com
