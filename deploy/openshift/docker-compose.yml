@@ -1,0 +1,12 @@
+db:
+  build: ./postgres
+web:
+  build: ./app
+  command: deploy/startall.sh /opt/maps
+  volumes:
+    - ../..:/opt/maps
+  ports:
+    - "8000:8000"
+    - "8008:8008"
+  links:
+    - db
