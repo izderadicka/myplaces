@@ -21,6 +21,8 @@ RUN apt-get update && apt-get install -y python-software-properties software-pro
 # Note: The official Debian and Ubuntu images automatically ``apt-get clean``
 # after each ``apt-get``
 
+RUN locale-gen en_US.UTF-8
+
 COPY main.sh /usr/local/bin/
 RUN chmod g=u /etc/passwd &&\
     chown -R root:root /etc/ssl/private &&\

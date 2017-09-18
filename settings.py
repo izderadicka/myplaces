@@ -10,10 +10,10 @@ ADMINS = (
      ('Ivan', 'admin@my-places.eu'),
 )
 
-openshift='OPENSHIFT_REPO_DIR' in os.environ
+openshift='KUBERNETES_SERVICE_HOST' in os.environ
 
 #Port for socketio server
-SIO_PORT=8000 if openshift else 8008
+SIO_PORT='' if openshift else '8008'
 
 def get_env(default, *args):
     for name in args:
@@ -215,7 +215,7 @@ PASSWORD_MAX_LENGTH = 32
 CAPTCHA_FLITE_PATH=None#'/usr/bin/flite'
 
 #proxy settings - disable if not behind reverse proxy
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.

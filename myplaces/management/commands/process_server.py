@@ -78,6 +78,9 @@ class Command(BaseCommand):
         if options.get('debug'):
             logging.basicConfig(level=logging.DEBUG)
             logging.getLogger().setLevel(logging.DEBUG)
+        else:
+            logging.basicConfig()
+            logging.getLogger().setLevel(logging.WARN)
         if options.get('test') :
             from django.db import connections, DEFAULT_DB_ALIAS
             conn=connections[DEFAULT_DB_ALIAS]

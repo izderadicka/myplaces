@@ -29,7 +29,6 @@ def parse_args():
     return opts.adr_and_port, opts
 
 def run(addrport, opts):
-
     if not addrport:
         addr = ''
         port = settings.SIO_PORT

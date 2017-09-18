@@ -19,6 +19,7 @@ import base64
 import pickle
 import logging
 from zmq.devices import ThreadDevice
+import traceback
 
 log=logging.getLogger('mp.remote')
 
@@ -126,6 +127,7 @@ def _check_running(call_id):
 def do_remote_call(socket, new_proc=True, allowed_methods=None, extra_kwargs={}):
     def _err(msg,e=None):
         socket.send_multipart((ERROR_TAG, msg))
+        traceback.print_exc()
         log.error(msg)
         if e:
             log.exception(str(e))

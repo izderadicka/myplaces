@@ -7,10 +7,17 @@
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog'  packages='myplaces'%}"></script>
 <script type="text/javascript">
 <!--
-var sioPort={{sio_port}},
-baseUrl='http://'+window.location.hostname+':'+sioPort,
+var sioPort='{{sio_port}}',
+baseUrl,
 log=null,
 firstAttempt=null;
+
+if (sioPort) {
+	baseUrl = window.location.protocol+'//'+window.location.hostname+':'+sioPort;
+} else {
+	baseUrl = window.location.protocol+'//'+window.location.host;
+}
+
 function submitForm() {
 	$('#submit_btn').prop('disabled',true);
 	var streamId='{{stream_id}}';

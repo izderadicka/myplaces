@@ -19,8 +19,6 @@ init() {
   
   # Create a PostgreSQL role named ``maps``  and
   # then create a database `maps` owned by the ``maps`` role.
-  
-  python setup.py build_ext --inplace
   python manage.py migrate
   python manage.py loaddata myplaces/fixtures/default_groups.json
   python manage.py shell <<EOF
@@ -28,6 +26,10 @@ from django.contrib.auth.models import User
 User.objects.create_superuser('admin', 'admin@example.com', '${MAPS_ADMIN_PASSWORD:-admin}')
 EOF
 }
+
+if [[ ! -f myplaces/voronoi.so ]]; then 
+  python setup.py build_ext --inplace
+fi
 
 if echo $ADMIN_EXISTS|grep ADMIN_EXISTS; then
   echo "App Already initiallized"
@@ -38,6 +40,6 @@ else
 fi
 
 #main entry point
-python runsocketio.py &
 python manage.py process_server &
-python manage.py runserver 0.0.0.0:8000
+python runsocketio.py 0.0.0.0:8008
+ 

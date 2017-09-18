@@ -32,13 +32,13 @@ init() {
   # then create a database `maps` owned by the ``maps`` role.
   
   mkdir -p $DATA_DIR
-  LANG=en_US.UTF-8 $BIN_DIR/initdb -D $DATA_DIR
+  $BIN_DIR/initdb --locale en_US.UTF-8 -E utf-8 -D $DATA_DIR
   
   $DB_PROCESS &
   DB_PID=$!
   sleep 1
   psql --command "CREATE USER maps WITH SUPERUSER PASSWORD '${MAPS_DB_PASSWORD}';"
-  createdb -O maps maps
+  createdb -O maps  maps
   psql -a -c "CREATE EXTENSION unaccent;"   maps
   psql -a -c "CREATE EXTENSION postgis;"   maps
   kill -INT $DB_PID
